@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.user.mapper.UserGroupMapper">
+	
+	<resultMap type="com.bizideal.whoami.user.entity.UserGroup" id="BasePMIResultMap">
+		<id column="user_id" jdbcType="VARCHAR" property="userId" />
+		<id column="group_id" jdbcType="VARCHAR" property="groupId" />
+	</resultMap>
+	
+	<sql id="baseUGsql">
+		user_id,group_id
+	</sql>
+	
+	<insert id="insertList" parameterType="list" >
+		INSERT INTO user_group
+		(
+		<include refid="baseUGsql"></include>
+		 ) VALUES
+	    <foreach collection="list" index="index" item="item"  separator="," >
+	      (#{item.userId},#{item.groupId})
+	    </foreach> 
+	</insert>
+	
+	<delete id="deleteList" parameterType="map">
+		DELETE FROM user_group WHERE group_id = #{groupId} AND user_id IN
+      <foreach collection="userIds"  index="index" item="userId" open="(" separator="," close=")"  >
+         #{userId}
+      </foreach>
+	</delete>
+	
+</mapper>

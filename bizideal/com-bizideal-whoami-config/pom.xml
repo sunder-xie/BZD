@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.bizideal.whoami</groupId>
+		<artifactId>com-bizideal-whoami-parent</artifactId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../com-bizideal-whoami-parent</relativePath>
+	</parent>
+	<artifactId>com-bizideal-whoami-config</artifactId>
+	<version>${env}-${com-bizideal-whoami-config.version}</version>
+	<packaging>jar</packaging>
+	<name>com-bizideal-whoami-config</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<!-- 根据传入的环境变量 打包不同的配置文件 -->
+	<build>
+		<finalName>com-bizideal-whoami-config</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<targetPath>${project.build.directory}/classes</targetPath>
+				<includes>
+					<include>**/*</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>deployEnv/${env}</directory>
+				<targetPath>${project.build.directory}/classes</targetPath>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+</project>

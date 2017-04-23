@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.core.meeting.mapper.SubMeetingInfoMapper">
+
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.facade.meeting.entity.SubMeetingInfo">
+    <id column="mee_id" jdbcType="INTEGER" property="meeId" />
+    <result column="hall_id" jdbcType="INTEGER" property="hallId" />
+    <result column="mee_name" jdbcType="VARCHAR" property="meeName" />
+    <result column="mee_parent_id" jdbcType="INTEGER" property="meeParentId" />
+    <result column="mee_intro" jdbcType="VARCHAR" property="meeIntro" />
+    <result column="mee_address" jdbcType="VARCHAR" property="meeAddress" />
+    <result column="mee_cover" jdbcType="VARCHAR" property="meeCover" />
+    <result column="mee_willnum" jdbcType="INTEGER" property="meeWillnum" />
+    <result column="mee_scale" jdbcType="INTEGER" property="meeScale" />
+    <result column="mee_start_time" jdbcType="BIGINT" property="meeStartTime" />
+    <result column="mee_end_time" jdbcType="BIGINT" property="meeEndTime" />
+    <result column="mee_contact_name" jdbcType="VARCHAR" property="meeContactName" />
+    <result column="mee_contact_number" jdbcType="VARCHAR" property="meeContactNumber" />
+    <result column="mee_contact_email" jdbcType="VARCHAR" property="meeContactEmail" />
+    <result column="mee_type" jdbcType="VARCHAR" property="meeType" />
+    <result column="mee_theme" jdbcType="VARCHAR" property="meeTheme" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="del_flag" jdbcType="INTEGER" property="delFlag" />
+  </resultMap>
+  
+	<update id="deleteSubMeetingInfo" parameterType="com.bizideal.whoami.facade.meeting.entity.SubMeetingInfo">
+		update sub_meeting_info
+	    set del_flag = #{delFlag,jdbcType=CHAR} 
+	    where 1=1 
+	    <if test="meeId != null " >
+			AND mee_id=#{meeId}
+		</if>
+		<if test="meeParentId != null  " >
+			AND mee_parent_id=#{meeParentId}
+		</if>
+	</update>
+	
+	<update id="deleteSubMeetingInfoByParentIds" parameterType="com.bizideal.whoami.facade.meeting.entity.SubMeetingInfo">
+		update sub_meeting_info 
+	    set del_flag =  1 
+	    where mee_parent_id in 
+	    <foreach collection="ids" item="meeId" index="index"
+            open="(" close=")" separator=",">
+            #{meeId}
+        </foreach>
+	</update>
+	
+	<update id="deleteSubMeetingInfoByIds" >
+		update sub_meeting_info 
+	    set del_flag =  1 
+	    where mee_id in 
+	    <foreach collection="ids" item="meeId" index="index"
+            open="(" close=")" separator=",">
+            #{meeId}
+        </foreach>
+	</update>
+	
+	<select id="selectSubMeetingByParentIdList" parameterType="java.util.Map" resultType="com.bizideal.whoami.facade.meeting.entity.SubMeetingInfo" >
+		SELECT mm.mee_id,mm.create_user,mm.hall_id,mm.mee_name,mm.mee_parent_id,mm.mee_intro,mm.mee_address,mm.mee_cover,mm.mee_willnum,
+			mm.mee_scale,mm.mee_start_time,mm.mee_end_time,mm.mee_contact_name,mm.mee_contact_number,mm.mee_contact_email,
+			mm.mee_type,mm.mee_theme,mm.create_time,mm.del_flag FROM sub_meeting_info mm 
+		    WHERE mm.mee_id IN 
+			<foreach collection="list" item="meeId" index="index"
+	            open="(" close=")" separator=",">
+	            #{meeId}
+	      	</foreach>
+	</select>
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.rolemodule.mapper.HallFunctionMapper">
+
+
+
+	<select id="getAllFunctionIds" resultType="java.lang.Integer">
+		select function_id from hall_function
+	</select>
+	
+ <select id="selectfunction"  parameterType="java.util.List" 
+		 resultType="com.bizideal.whoami.rolemodule.entity.HallFunction">
+		select * from hall_function where function_id in
+	<foreach collection="list" item="module_id" open="(" close=")"
+      separator=",">
+      #{module_id}
+   </foreach>
+  </select>
+	
+	
+</mapper>

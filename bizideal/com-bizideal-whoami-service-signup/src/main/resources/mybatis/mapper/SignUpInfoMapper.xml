@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.signup.mapper.SignUpInfoMapper">
+	<resultMap type="com.bizideal.whoami.signup.entity.SignUpInfo" id="BaseResultMap">
+		<result column="id" jdbcType="VARCHAR"  property="id"/>
+		<result column="meethall_id" jdbcType="INTEGER"  property="meethallId"/>
+		<result column="meeting_id" jdbcType="INTEGER"  property="meetingId"/>
+		<result column="email" jdbcType="VARCHAR"  property="email"/>
+		<result column="disp" jdbcType="VARCHAR"  property="disp"/>
+		<result column="user_id" jdbcType="VARCHAR"  property="userId"/>
+		<result column="diet_id" jdbcType="INTEGER"  property="dietId"/>
+		<result column="create_datatime" jdbcType="BIGINT"  property="createDatatime"/>
+		<result column="unit_id" jdbcType="INTEGER"  property="unitId"/>
+		<result column="identity_id" jdbcType="INTEGER"  property="identityId"/>
+		<result column="post" jdbcType="VARCHAR"  property="post"/>
+		<result column="message_ids" jdbcType="VARCHAR"  property="messageIds"/>
+		<result column="is_pend" jdbcType="VARCHAR"  property="isPend"/>
+		<result column="reject_reason" jdbcType="VARCHAR"  property="rejectReason"/>
+		<collection property="subMeetings" column="id" ofType="UserSignupSubmeeting" 
+					select="com.bizideal.whoami.signup.mapper.UserSignupSubmeetingMapper.selectSignUpSubmeets"/>
+	</resultMap>
+	
+	<select id="selectSignUpInfoByUserIdMeeId" resultMap="BaseResultMap">
+		SELECT * FROM user_signup_info 
+			WHERE user_id=#{userId} AND meeting_id=#{meeId}
+	</select>
+	
+	<select id="selectMeetingIdByUserId" resultType="Integer">
+		SELECT u.meeting_id FROM user_signup_info u WHERE u.user_id=#{userId}
+	</select>
+	
+	<select id="selectBySignUpId" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT * FROM user_signup_info u WHERE u.id = #{_parameter}
+	</select>
+	
+	<select id="selectSubMeetingIdByUserId" resultType="Integer">
+		SELECT us.submeeting_id FROM user_signup_submeeting us WHERE us.signup_id IN 
+			(SELECT u.id FROM user_signup_info u WHERE u.user_id=#{userId} AND u.meeting_id =#{meeId})
+	</select>
+	
+	<!-- 查询单位下有多少人报名 -->
+	<select id="selectCountByUnitIdMeeId" resultType="Integer">
+		SELECT COUNT(*) FROM user_signup_info us WHERE us.unit_id = #{unitId} AND us.meeting_id = #{meeId} AND is_pend != 2
+	</select>
+	
+	<!-- 查询主会议下有多少人报名,isPend是查询条件，如为空，则查询所有 -->
+	<select id="selectCountByMeeId" resultType="Integer">
+		SELECT COUNT(*) FROM user_signup_info us WHERE us.meeting_id = #{meeId}
+		<if test="isPend != null">
+			AND us.is_pend = #{isPend}
+		</if>
+	</select>
+	
+	<!-- 管理员修改报名基本信息 -->
+	<update id="updateSignUp" parameterType="com.bizideal.whoami.dto.SignUpInfoEditDto" >
+		UPDATE user_signup_info SET 
+			email = #{email},
+			diet_id = #{dietId},
+			unit_id = #{unitId},
+			identity_id = #{identityId},
+			post = #{post},
+			disp = #{disp} 
+		WHERE id = #{signUpId}
+	</update>
+	
+	<!-- 根据id删除之前报名的子会议 -->
+	<delete id="deleteMySubMeetings" parameterType="com.bizideal.whoami.dto.SignUpInfoEditDto">
+		DELETE FROM user_signup_submeeting WHERE signup_id = #{signUpId}
+	</delete>
+	
+	<!-- 根据id删除报名信息 -->
+	<delete id="deleteSignUpInfoById" parameterType="java.lang.String">
+		DELETE FROM user_signup_info WHERE id = #{_parameter}
+	</delete>
+	
+	<!-- 批量插入子会议信息 -->
+	<insert id="insertSubMeeBatch" parameterType="list">
+		INSERT INTO user_signup_submeeting (signup_id,submeeting_id,create_datatime) VALUES
+		<foreach collection="list" index="index" item="item" separator="," >
+	      (#{signupId},#{submeetingId},#{createDatatime})
+	    </foreach> 
+	</insert>
+</mapper>

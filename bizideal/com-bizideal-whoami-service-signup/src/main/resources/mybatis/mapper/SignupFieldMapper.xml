@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.signup.mapper.SignupFieldMapper">
+	<resultMap type="com.bizideal.whoami.signup.entity.SignupField" id="BaseSignupFieldMap">
+		<id column="field_id" jdbcType="INTEGER"  property="fieldId"/>
+		<result column="field_name" jdbcType="VARCHAR"  property="fieldName"/>
+		<result column="field_basics" jdbcType="VARCHAR"  property="fieldBasics"/>
+		<result column="field_dsp" jdbcType="VARCHAR"  property="fieldDsp"/>
+	</resultMap>
+	
+	<select id="selectSignupFieldsByModuids" parameterType="list" resultMap="BaseSignupFieldMap">
+		SELECT sf.* FROM signup_field_module_link sm LEFT JOIN signup_field sf ON sm.field_id = sf.field_id
+		WHERE sm.module_id IN 
+		<foreach collection="list" index="index" item="moduldId" open="("
+			separator="," close=")">
+			#{moduldId}
+		</foreach>
+		UNION
+		SELECT * FROM signup_field s WHERE s.field_basics = 1 ORDER BY field_id
+	</select>
+	
+	<select id="selectSignupFieldsByMeeId" parameterType="list" resultMap="BaseSignupFieldMap">
+		SELECT * FROM signup_field sf WHERE sf.field_id IN 
+		<foreach collection="list" index="index" item="fieldId" open="("
+			separator="," close=")">
+			#{fieldId}
+		</foreach>
+	</select>
+	
+</mapper>

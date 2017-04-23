@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.rolemodule.mapper.ModuleMapper">
+
+
+
+
+
+	<!-- 根据主会议查询出模块Id -->
+	<!-- <select id="selectHallModules" parameterType="int"
+		resultType="com.bizideal.whoami.rolemodule.entity.Module">
+		select * from module where module_id in (
+		select module_id from hall_module
+		where meet_id=#{meetId}
+		)
+		
+	</select> -->
+	<select id="selectMeetingModulesId" parameterType="java.lang.Integer"
+		resultType="java.lang.String">
+		SELECT
+			module_id
+		FROM
+			hall_module
+		WHERE
+			meet_id = #{meetId}
+	</select>
+	
+	<select id="selectmeetingModules"  parameterType="java.util.List" 
+			 resultType="com.bizideal.whoami.rolemodule.entity.Module">
+		select * from module where module_id in
+		<foreach collection="list" item="module_id" open="(" close=")"
+	    separator=",">
+	      #{module_id}
+	   </foreach>
+	</select>
+			
+	<!-- 查询用户是否在该主会议下有角色 -->
+	<select id="countUseridHallId" resultType="java.lang.Long">
+		select count(*) from user_role_link where 
+		user_id=#{userid} and meeting_id=#{meeting_id}
+	</select>		
+			
+			
+	<!-- <insert id="batchsaveHallModules" parameterType="java.util.List">
+		insert into hall_module (meet_hall_id,meet_id,module_id) values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.meet_hall_id},#{item.meet_id},#{item.module_id})
+		</foreach>
+	</insert> -->
+	
+	<delete id="deleteHallModules" parameterType="int">
+		delete from hall_module where meet_id=#{meet_id}
+	</delete>
+	
+	
+	<select id="getAllModuleIds" resultType="java.lang.Integer">
+		select  module_id from module
+	</select>
+	
+	
+	<select id="getNoSignupModuleIds" resultType="java.lang.Integer">
+		select  module_id from module where module_status='default'
+	</select>
+	
+	
+	
+	<select id="getSignupModuleIds" resultType="java.lang.Integer">
+		select  module_id from module where module_type='default'
+	</select>
+
+
+</mapper>

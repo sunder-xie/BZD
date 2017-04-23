@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.mapper.SenceCaseInfoMapper">
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.sencevote.entity.SenceCaseInfo">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="vote_id" jdbcType="INTEGER" property="voteId" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="unit" jdbcType="VARCHAR" property="unit" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="del_flag" jdbcType="TINYINT" property="delFlag" />
+    <result column="number" property="number" jdbcType="INTEGER" />
+  </resultMap>
+  <select id="selectAllSenceCaseInfoByMeeId" resultMap="BaseResultMap">
+  	SELECT sc.id,sc.vote_id,sc.province,sc.unit,sc.name,sc.user_id,sc.del_flag
+		FROM sence_case_info sc 
+		LEFT JOIN vote_info v ON sc.vote_id=v.id 
+	WHERE v.meeting_id=#{meeId} and sc.del_flag=0 
+	ORDER BY sc.id
+  </select>
+  
+  <select id="selectSenceCaseInfoByMeeIdCondition" resultMap="BaseResultMap">
+  	SELECT sc.id,sc.vote_id,sc.province,sc.unit,sc.name,sc.user_id,sc.del_flag,scc.number
+		FROM sence_case_info sc 
+		LEFT JOIN vote_info v ON sc.vote_id=v.id 
+		LEFT JOIN sence_case_count scc ON scc.sence_case_id=sc.id 
+	WHERE v.meeting_id=#{meeId} and sc.del_flag=0 
+	<if test="province != null">
+        and sc.province=#{province} 
+      </if>
+      <if test="unit != null">
+        and sc.unit=#{unit} 
+      </if>
+      <if test="name != null">
+        and sc.name=#{name} 
+      </if>
+      ORDER BY sc.id 
+  </select>
+  
+  <select id="selectSenceCaseInfoByUserIdMeeId" resultMap="BaseResultMap">
+  	SELECT sc.id,sc.vote_id,sc.province,sc.unit,sc.name,sc.user_id,sc.del_flag 
+		FROM sence_case_info sc 
+		LEFT JOIN vote_info v ON sc.vote_id=v.id 
+	WHERE v.meeting_id=#{meeId} AND sc.id IN
+		(SELECT DISTINCT sr.sence_case_id FROM sence_case_voting_record sr WHERE sr.user_id=#{userId})
+	AND sc.del_flag=0 
+	ORDER BY sc.id 
+  </select>
+</mapper>

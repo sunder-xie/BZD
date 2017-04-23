@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.rolemodule.mapper.RoleUnitMapper">
+
+    <delete id="deleteByRoleId" parameterType="int">
+		delete from role_unit where role_id=#{roleid}
+	</delete>
+	
+	<update id="updateByRoleId" parameterType="com.bizideal.whoami.rolemodule.entity.RoleUnit">
+		update role_unit SET cost =#{cost},people_number=#{peopleNumber} where  role_id =#{roleId}
+	</update>
+
+
+</mapper>

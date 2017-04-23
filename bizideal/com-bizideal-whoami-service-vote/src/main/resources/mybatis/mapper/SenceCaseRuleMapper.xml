@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.mapper.SenceCaseRuleMapper">
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.sencevote.entity.SenceCaseRule">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="vote_id" jdbcType="INTEGER" property="voteId" />
+    <result column="rule_name" jdbcType="VARCHAR" property="ruleName" />
+    <result column="user" jdbcType="INTEGER" property="user" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="repeat_num" jdbcType="INTEGER" property="repeatNum" />
+  </resultMap>
+  <select id="selectByMeeId" resultMap="BaseResultMap">
+  	SELECT sr.* FROM sence_case_rule sr 
+		LEFT JOIN vote_info v ON v.id=sr.vote_id 
+	WHERE v.meeting_id=#{meeId}
+  </select>
+</mapper>

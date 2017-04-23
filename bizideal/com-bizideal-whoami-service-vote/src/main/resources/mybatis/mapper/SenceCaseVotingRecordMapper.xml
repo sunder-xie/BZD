@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.mapper.SenceCaseVotingRecordMapper">
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.sencevote.entity.SenceCaseVotingRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="sence_case_id" jdbcType="INTEGER" property="senceCaseId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="time" jdbcType="BIGINT" property="time" />
+    <result column="meeting_id" jdbcType="INTEGER" property="meetingId" />
+  </resultMap>
+  
+    <insert id="insertSenceCaseVotingRecord" parameterType="com.bizideal.whoami.sencevote.entity.SenceCaseVotingRecord" useGeneratedKeys="true" keyProperty="id">
+  	{call sence_case_vote(
+  		#{senceCaseId,mode=IN},#{time,mode=IN}, #{meetingId,mode=IN},#{userId,mode=IN}
+  	)}
+  </insert> 
+
+  <delete id="deleteByMeetings">
+  	delete from sence_case_voting_record
+  	<where>
+  		meeting_id in 
+		<foreach collection="list" item="vote" index="index" open="(" close=")" separator=",">
+			#{vote.meetingId}
+		</foreach>
+  	</where>
+  </delete>
+  
+  <select id="selectBySenceCaseId" resultMap="BaseResultMap">
+  	select r.*,uw.real_name from
+  	sence_case_voting_record r
+  	left outer join user_weixin_info uw on uw.user_id=r.user_id
+  	<where>
+  		r.sence_case_id=#{senceCaseId}
+  	</where>
+  </select>
+</mapper>

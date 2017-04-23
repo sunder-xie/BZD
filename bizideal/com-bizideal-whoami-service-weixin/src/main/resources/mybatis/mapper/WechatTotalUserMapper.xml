@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.weixin.mapper.WechatTotalUserMapper">
+
+  <select id="getTotalusersByOpenids" resultType="com.bizideal.whoami.weixin.entity.WechatTotalUser">
+        select * from wechat_total_user where openid in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item.openid}
+        </foreach>
+   </select>
+   
+   <insert id="batchSaveTotalUser" parameterType="java.util.List">
+		insert into wechat_total_user(openid) values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item})
+		</foreach>
+	</insert>
+<select id="getTotalByOpenids" resultType="com.bizideal.whoami.weixin.entity.WechatTotalUser">
+        select * from wechat_total_user where openid in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+   </select>
+   
+   <delete id="deleteTotalUser" parameterType="java.lang.String">
+		delete from wechat_total_user where openid=#{openid}
+	</delete>
+	
+	<select id="getFromDBByOpenids" resultType="string">
+        select openid from wechat_total_user where openid in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+   </select>
+
+
+</mapper>

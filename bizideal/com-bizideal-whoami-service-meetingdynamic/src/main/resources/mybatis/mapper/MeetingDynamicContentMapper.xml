@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.mapper.MeetingDynamicContentMapper">
+
+ 	<insert id="addBatchDynamic" useGeneratedKeys="true" parameterType="java.util.List">
+		INSERT INTO meeting_dynamic_content ( content_id,dynamic_id,content,meeting_id,meet_hall_id)
+			 VALUES 
+		<foreach collection="list" item="item" index="index" separator="," >
+			 ( #{item.contentId},#{item.dynamicId},#{item.content},#{item.meetingId},#{item.meetHallId})
+		</foreach>
+	</insert>
+
+	<delete id="deleteDynamicContentBatch" parameterType="com.bizideal.whoami.meetingdynamic.entity.MeetingDynamicContent" >
+		delete FROM meeting_dynamic_content 
+			where meeting_id=#{meetingId} 
+	</delete>
+</mapper>

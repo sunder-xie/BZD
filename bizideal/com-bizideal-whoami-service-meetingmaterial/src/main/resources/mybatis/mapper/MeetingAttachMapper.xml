@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.core.meetingmaterial.mapper.MeetingAttachMapper">
+  
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.facade.meetingmaterial.entity.MeetingAttach">
+    <id column="attach_id" jdbcType="INTEGER" property="attachId" />
+    <result column="hall_id" jdbcType="INTEGER" property="hallId" />
+    <result column="submee_id" jdbcType="INTEGER" property="submeeId" />
+    <result column="parmee_id" jdbcType="INTEGER" property="parmeeId" />
+    <result column="attach_name" jdbcType="VARCHAR" property="attachName" />
+    <result column="attach_suffix" jdbcType="VARCHAR" property="attachSuffix" />
+    <result column="attach_url" jdbcType="VARCHAR" property="attachUrl" />
+    <result column="attach_type" jdbcType="CHAR" property="attachType" />
+    <result column="attach_is_down" jdbcType="CHAR" property="attachIsDown" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+    <result column="update_time" jdbcType="BIGINT" property="updateTime" />
+    <result column="del_flag" jdbcType="CHAR" property="delFlag" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    attach_id, hall_id, submee_id, parmee_id, attach_name, attach_suffix, attach_url, 
+    attach_type,attach_is_down, remarks, create_user, create_time, update_user, update_time, del_flag
+  </sql>
+ 
+</mapper>

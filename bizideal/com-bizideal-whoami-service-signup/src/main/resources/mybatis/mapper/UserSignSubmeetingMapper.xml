@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.signup.mapper.UserSignupSubmeetingMapper">
+	
+	<resultMap type="com.bizideal.whoami.signup.entity.UserSignupSubmeeting" id="BaseResultMap">
+		<result column="id" jdbcType="INTEGER"  property="id"/>
+		<result column="signup_id" jdbcType="INTEGER"  property="signupId"/>
+		<result column="submeeting_id" jdbcType="INTEGER"  property="submeetingId"/>
+		<result column="create_datatime" jdbcType="BIGINT"  property="createDatatime"/>
+		<result column="dsp" jdbcType="VARCHAR"  property="dsp"/>
+	</resultMap>
+	<select id="selectSignUpSubmeets" resultMap="BaseResultMap">
+		SELECT id,signup_id,submeeting_id,create_datatime,dsp FROM user_signup_submeeting  
+			WHERE signup_id=#{id}
+	</select>
+</mapper>

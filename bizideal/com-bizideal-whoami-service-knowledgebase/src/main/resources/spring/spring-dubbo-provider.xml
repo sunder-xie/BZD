@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans.xsd  
+            http://code.alibabatech.com/schema/dubbo 
+            http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+	
+	<!-- 提供方应用信息，用于计算依赖关系 -->
+	<dubbo:application name="knowledgebase-provider" owner="programmer" organization="dubbox"/>
+
+    <!-- 使用zookeeper注册中心暴露服务地址 -->
+    <dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}"/>
+    
+    <!-- 监控中心配置，protocol="registry"，表示从注册中心发现监控中心地址 -->
+    <dubbo:monitor protocol="registry"/>
+
+    <dubbo:protocol name="dubbo" serialization="kryo" host="${dubbo.protocol.host}" port="${dubbo.rpc.knowledgebase.port}"/>
+
+   
+    <!-- 和本地bean一样实现服务 -->
+	<!-- 声明需要暴露的服务接口 -->
+	<!-- 账户管理 -->
+	<!-- dubbo:service cluster="failfast/failover" 配置集群容错  retries="2" 写操作failfast 不重试 读操作failover 重试2次 -->
+<!-- 	<dubbo:service interface="com.bizideal.whoami.demo.facade.DemoFacade" ref="demoFacade" protocol="dubbo" /> -->
+	<dubbo:service interface="com.bizideal.whoami.knowledgebase.facade.KnowledgeCollectionFacade" ref="knowledgeCollectionFacade" protocol="dubbo" />
+	<dubbo:service interface="com.bizideal.whoami.knowledgebase.facade.KnowledgeFileFacade" ref="knowledgeFileFacade" protocol="dubbo" />
+	<dubbo:service interface="com.bizideal.whoami.knowledgebase.facade.KnowledgeTypeFacade" ref="knowledgeTypeFacade" protocol="dubbo" />
+	
+	<!-- use tomcat server -->
+    <!-- <dubbo:protocol name="rest" host="${dubbo.protocol.host}" port="${dubbo.restful.knowledgebase.port}" threads="500" contextpath="whoami" server="tomcat" accepts="500"
+                    extension="com.bizideal.whoami.filter.DubboxRestCORSFilter,com.alibaba.dubbo.rpc.protocol.rest.support.LoggingFilter"/>
+    <dubbo:service interface="com.bizideal.whoami.demo.facade.DemoRestFacade" ref="demoRestFacade" protocol="rest" 
+     validation="true"/> -->
+
+</beans>  

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.weixin.mapper.WechatNewsMapper">
+	<resultMap type="com.bizideal.whoami.weixin.entity.WechatNews"
+		id="wechatNews">
+		<id property="mediaId" column="media_id" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+
+
+
+
+	<resultMap type="com.bizideal.whoami.weixin.entity.WechatNews"
+		id="news" extends="wechatNews">
+		<collection property="newsItems"
+			ofType="com.bizideal.whoami.weixin.entity.WechatNewsItem">
+			<id property="itemId" column="item_id" />
+
+			<result property="title" column="title" />
+
+			<result property="author" column="author" />
+			<result property="digest" column="digest" />
+
+			<result property="content" column="content" />
+			<result property="contentSourceUrl" column="content_source_url" />
+
+			<result property="thumbMediaId" column="thumb_mediaId" />
+			<result property="showCoverPic" column="show_cover_pic" />
+
+			<result property="url" column="url" />
+			<result property="thumbUrl" column="thumb_url" />
+
+			<result property="indexs" column="indexs" />
+			<result property="newsMediaId" column="news_media_id" />
+
+		</collection>
+
+
+	</resultMap>
+
+	<select id="getWechatNewsByMediaId" resultMap="news"
+		parameterType="string">
+		select wn.*,wni.* from wechat_news wn left join
+		wechat_news_item
+		wni on
+		wn.media_id=wni.news_media_id where
+		wn.media_id=#{mediaid} order by wni.indexs
+	</select>
+
+	<select id="getAllWechatNews" resultMap="news">
+		select wn.*,wni.* from
+		wechat_news wn left join wechat_news_item
+		wni on
+		wn.media_id=wni.news_media_id order by wn.update_time desc,wni.indexs
+	</select>
+
+<!-- 一下是使用PageHelpEr插件实现一对多分页查询  start-->
+	<select id="selectnewsitem" parameterType="string"
+		resultType="com.bizideal.whoami.weixin.entity.WechatNewsItem">
+		select * from wechat_news_item where
+		news_media_id=#{mediaid}
+	</select>
+	<resultMap id="newsMap" type="com.bizideal.whoami.weixin.entity.WechatNews"
+		extends="wechatNews">
+
+		<collection property="newsItems"
+			ofType="com.bizideal.whoami.weixin.entity.WechatNewsItem" javaType="java.util.ArrayList"
+			column="media_id" select="selectnewsitem">
+		</collection>
+	</resultMap>
+
+
+	<select id="getNewsByPage" resultMap="newsMap">
+	<![CDATA[
+		
+select * from wechat_news  order by update_time desc
+	]]>
+	</select>
+	<!-- 一下是使用PageHelpEr插件实现一对多分页查询  end-->
+
+
+<insert id="batchInsertNews" parameterType="java.util.List">
+		insert into wechat_news(media_id,update_time) values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.mediaId},#{item.updateTime})
+		</foreach>
+	</insert>
+
+
+
+</mapper>

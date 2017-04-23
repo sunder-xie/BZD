@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.rolemodule.mapper.HallRoleModuleMapper">
+
+	<resultMap type="com.bizideal.whoami.rolemodule.entity.HallRole"
+		id="role">
+
+		<id column="role_id" property="roleId" />
+		<result column="role_name" jdbcType="VARCHAR" property="roleName" />
+		<result column="role_type" jdbcType="VARCHAR" property="roleType" />
+		<result column="role_remark" jdbcType="VARCHAR" property="roleRemark" />
+		<result column="meet_hall_id" property="meetHallId" />
+		<result column="role_status" property="roleStatus" />
+
+	</resultMap>
+	
+	<resultMap type="com.bizideal.whoami.rolemodule.entity.HallRole"
+	 id="roleModuleUrl"	extends="role">	 
+		<result column="function_id" property="functionsString" />
+	</resultMap>
+	
+	<resultMap type="com.bizideal.whoami.rolemodule.entity.HallRole"
+		id="roleModuleMap" extends="role">
+
+		<collection property="functions"
+			ofType="com.bizideal.whoami.rolemodule.entity.HallFunction">
+
+			<id property="functionId" column="function_id" />
+			<result property="functionName" column="function_name" />
+			<result property="functionRemark" column="function_remark" />
+			<result property="functionType" column="function_type" />
+			<result property="functionStatus" column="function_status" />
+
+		</collection>
+	</resultMap>
+
+
+
+	<!--查询该角色是否拥有该模块 -->
+	<select id="findRoleModule" parameterType="hashMap" resultType="int">
+		select count(*) from role_function where
+		role_id=#{role_id,jdbcType=NUMERIC} and
+		function_id=#{function_id,jdbcType=NUMERIC}
+	</select>
+
+	<!-- 根据角色类型和 会议厅id查询相应的角色 -->
+	<select id="getRoleByCondition" resultMap="role">
+		select * from hall_role where 1=1
+		<if test="roleType!=null &amp;&amp; roleType.length()>0">
+			and role_type =#{roleType,jdbcType=VARCHAR}
+		</if>
+		<if test="meet_hall_id>0">
+			and meet_hall_id=#{meet_hall_id}
+		</if>
+	</select>
+
+	<!-- 新增角色和功能关联 -->
+	<insert id="saveRoleModules" parameterType="hashMap">
+		insert into
+		role_function(role_id,function_id) values(
+		#{role_id,jdbcType=NUMERIC},
+		#{function_id,jdbcType=NUMERIC}
+		)
+	</insert>
+
+	<insert id="batchsaveRoleModules" parameterType="java.util.List">
+		insert into role_function(role_id,function_id) values(
+			#{role_id,jdbcType=NUMERIC},
+			#{function_id,jdbcType=NUMERIC}
+		)
+	</insert>
+
+
+	<delete id="deleteRoleModules" parameterType="int">
+		delete from
+		role_function where role_id=#{role_id}
+	</delete>
+
+	<!-- 根据用户id和会议厅id查询角色 -->
+	<select id="findRoleByUserIdHallId" resultMap="roleModuleUrl">
+		SELECT
+			r.role_name,
+			r.role_id,
+			r.role_type,
+			r.meet_hall_id,
+			r.role_status,
+			r.role_remark,
+			rf.function_id
+		FROM
+			hall_role r
+		LEFT JOIN role_function rf ON r.role_id = rf.role_id
+		 where r.role_id = (select hall_role_id
+				from user_hallrole_link
+				where user_id=#{userid} 
+					and meet_hall_id=
+				#{meethallid}	
+		       )
+	</select>
+
+	<!-- 获取会议厅管理员集合 -->
+	<select id="getManagerUserIdByhallid" parameterType="int"
+		resultType="string">
+		select user_id from user_hallrole_link where hall_role_id in (
+		select role_id from hall_role where meet_hall_id=#{hallid}
+		and role_type='manager')
+	</select>
+	
+	<update id="updateHallRoleFunction">
+		UPDATE role_function SET function_id=#{functionid}  WHERE role_id = #{hallid}	
+	</update>
+	
+   <select id="findByHallRoleModuleId" parameterType="int" resultMap="roleModuleUrl">
+	    SELECT
+			r.role_name,
+			r.role_id,
+			r.role_type,
+			r.meet_hall_id,
+			r.role_status,
+			r.role_remark,
+			rm.function_id
+		FROM
+			hall_role r
+		LEFT JOIN role_function rm ON r.role_id = rm.role_id
+		WHERE
+			r.role_id = #{roleid}
+	</select>
+	
+	<!-- 查询会议厅下角色名是否重复 -->
+	<select id="existHallRoleName" resultMap="role">
+		select * from hall_role where role_name=#{roleName} and meet_hall_id=#{meetHallId}
+	</select>
+	
+
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.core.meeting.mapper.HallLinkUserMapper">
+  
+  <resultMap id="hallLinkUser" type="com.bizideal.whoami.facade.meeting.entity.HallLinkUser">
+    <id column="user_id" jdbcType="VARCHAR" property="userId" />
+    <id column="hall_id" jdbcType="INTEGER" property="hallId" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+  </resultMap>
+
+
+	<!-- 统计某个会议厅的关注人数 -->
+	<select id="countUserIdByHallId" parameterType="java.lang.Integer" resultType="int">
+		SELECT count(*) FROM hall_link_user WHERE hall_id = #{hallId}
+	</select>
+	
+	<!-- 会议厅下的粉丝信息   -->
+	<select id="ListUserIdByHallId" parameterType="java.lang.Integer" resultType="com.bizideal.whoami.facade.meeting.entity.HallLinkUser">
+		SELECT
+			h.user_id, h.hall_id, h.create_time, u.headimgurl, u.real_name
+		FROM
+			hall_link_user AS h
+		LEFT JOIN 
+			user_weixin_info AS u ON h.user_id = u.user_id
+		WHERE
+			hall_id = #{hallId}
+	</select>
+	
+	<!-- 我关注的会议厅   -->
+	<select id="ListHallByUserId" parameterType="java.lang.String" resultType="com.bizideal.whoami.facade.meeting.entity.HallLinkUser">
+		SELECT
+			h.user_id, h.hall_id, h.create_time, m.hall_name, m.hall_cover
+		FROM
+			hall_link_user AS h
+		LEFT JOIN 
+			meeting_hall AS m ON h.hall_id = m.hall_id
+		WHERE
+			h.user_id = #{userId}
+	</select>
+	
+</mapper>

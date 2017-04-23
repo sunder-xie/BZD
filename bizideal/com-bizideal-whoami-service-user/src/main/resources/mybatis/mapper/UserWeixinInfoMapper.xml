@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.user.mapper.UserWeixinInfoMapper">
+
+	<resultMap id="BaseUWIResultMap"
+		type="com.bizideal.whoami.user.entity.UserWeixinInfo">
+		<id column="user_id" jdbcType="VARCHAR" property="userId" />
+		<result column="unionid" jdbcType="VARCHAR" property="unionid" />
+		<result column="openid" jdbcType="VARCHAR" property="openid" />
+		<result column="subscribe" jdbcType="VARCHAR" property="subscribe" />
+		<result column="real_name" jdbcType="VARCHAR" property="realName" />
+		<result column="nickname" jdbcType="VARCHAR" property="nickname" />
+		<result column="sex" jdbcType="VARCHAR" property="sex" />
+		<result column="headimgurl" jdbcType="VARCHAR" property="headimgurl" />
+		<result column="country" jdbcType="VARCHAR" property="country" />
+		<result column="province" jdbcType="VARCHAR" property="province" />
+		<result column="city" jdbcType="VARCHAR" property="city" />
+		<result column="subscribe_time" jdbcType="BIGINT" property="subscribeTime" />
+		<result column="language" jdbcType="VARCHAR" property="language" />
+		<result column="remark" jdbcType="VARCHAR" property="remark" />
+		<result column="groupid" jdbcType="VARCHAR" property="groupid" />
+		<result column="weixin" jdbcType="VARCHAR" property="weixin" />
+		<result column="phone" jdbcType="VARCHAR" property="phone" />
+		<result column="password" jdbcType="VARCHAR" property="password" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		user_id,unionid,openid,subscribe,real_name,nickname,sex,headimgurl,country,province,city,
+		subscribe_time,language,remark,groupid,weixin
+	</sql>
+
+	<select id="selectByUserIds" parameterType="list" resultMap="BaseUWIResultMap">
+		SELECT * FROM user_weixin_info uw LEFT JOIN user_info ui ON uw.user_id
+		= ui.user_id WHERE uw.user_id IN
+		<foreach collection="list" index="index" item="userId" open="("
+			separator="," close=")">
+			#{userId}
+		</foreach>
+	</select>
+
+	<!-- 根据会议id查询报名信息 -->
+	<select id="selectBySignUp" parameterType="com.bizideal.whoami.user.dto.SignUpMeetingDto"
+		resultMap="BaseUWIResultMap">
+		SELECT uw.user_id,uw.sex,uw.real_name,ui.phone,us.is_pend AS remark FROM user_signup_info
+		us LEFT JOIN user_info ui ON us.user_id = ui.user_id
+		LEFT JOIN
+		user_weixin_info uw ON us.user_id = uw.user_id
+		WHERE us.meeting_id =
+		#{meeId} AND ui.user_id IS NOT NULL
+		<if test="name != null &amp;&amp; name != ''">
+			AND (
+			uw.real_name LIKE CONCAT("%",#{name},"%")
+			OR uw.sex
+			LIKE
+			CONCAT("%",#{name},"%")
+			OR ui.phone LIKE CONCAT("%",#{name},"%")
+			)
+		</if>
+		 ORDER BY us.create_datatime DESC
+	</select>
+
+	<update id="updateImgAndName" parameterType="com.bizideal.whoami.user.entity.UserWeixinInfo">
+		UPDATE user_weixin_info
+		<set>
+			nickname=#{nickname},
+			real_name=#{realName},
+			<if test="headimgurl != null &amp;&amp; headimgurl != ''">headimgurl=#{headimgurl},</if>
+		</set>
+		WHERE user_id = #{userId}
+	</update>
+
+	<!-- 报名信息更新，根据情况更新默认邮箱 -->
+	<update id="updateSignUpInfo" parameterType="com.bizideal.whoami.user.entity.UserWeixinInfo">
+		UPDATE user_weixin_info
+		<set>
+			real_name = #{realName},
+			sex = #{sex},
+			<if test="email != null &amp;&amp; email != ''">email=#{email},</if>
+		</set>
+		WHERE user_id = #{userId}
+	</update>
+</mapper>

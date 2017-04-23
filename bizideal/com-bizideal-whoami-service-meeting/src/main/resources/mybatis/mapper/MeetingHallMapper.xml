@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.core.meeting.mapper.MeetingHallMapper">
+
+	<resultMap id="BaseResultMap" type="com.bizideal.whoami.facade.meeting.entity.MeetingHall">
+		<id column="hall_id" jdbcType="INTEGER" property="hallId" />
+		<result column="hall_name" jdbcType="VARCHAR" property="hallName" />
+		<result column="hall_intro" jdbcType="VARCHAR" property="hallIntro" />
+		<result column="hall_back_image" jdbcType="VARCHAR" property="hallBackImage" />
+		<result column="hall_cover" jdbcType="VARCHAR" property="hallCover" />
+		<result column="hall_theme" jdbcType="VARCHAR" property="hallTheme" />
+		<result column="hall_type" jdbcType="CHAR" property="hallType" />
+		<result column="user_id" jdbcType="VARCHAR" property="userId" />
+		<result column="hall_leave_time" jdbcType="BIGINT" property="hallLeaveTime" />
+		<result column="hall_visits" jdbcType="INTEGER" property="hallVisits" />
+		<result column="hall_vip_type" jdbcType="CHAR" property="hallVipType" />
+		<result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+		<result column="update_time" jdbcType="BIGINT" property="updateTime" />
+		<result column="create_user" jdbcType="VARCHAR" property="createUser" />
+		<result column="create_time" jdbcType="BIGINT" property="createTime" />
+		<result column="del_flag" jdbcType="CHAR" property="delFlag" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		hall_id, hall_name, hall_intro, hall_back_image, hall_cover, hall_theme, hall_type, user_id,
+		hall_leave_time, hall_Visits, create_time, del_flag
+	</sql>
+
+	<!-- 用户最后离开的会议厅 -->
+	<select id="queryByUserIdMeetingHall" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM meeting_hall
+		WHERE user_id = #{userId} and del_flag = 0 ORDER BY hall_leave_time DESC LIMIT 1
+	</select>
+
+	<!-- 根据ids_List 查询相对应得会议厅列表 -->
+	<select id="queryByUserIdsMeeHall" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM meeting_hall WHERE hall_id in
+		<foreach item="hall_ids" index="index" collection="list" open="(" separator="," close=")">
+			#{hall_ids}
+		</foreach>
+		ORDER BY hall_leave_time DESC
+	</select>
+	
+	<!-- 热门会议厅 -->
+	<select id="listUserFollowHotHall" parameterType="java.lang.String" resultType="com.bizideal.whoami.facade.meeting.dto.MeetingHallDto">
+		SELECT h.* , (CASE WHEN hu.hall_id  is null then 'false' ELSE 'true' END) AS isFollow
+		FROM meeting_hall h
+		LEFT JOIN hall_link_user AS hu ON h.hall_id = hu.hall_id AND hu.user_id = #{userId}
+		WHERE h.del_flag = 0 ORDER BY h.hall_id
+	</select>
+	
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.rolemodule.mapper.HallModuleMapper">
+
+	<!-- 新增主会议和模块关联 -->
+	<insert id="insertHallModule" parameterType="hashMap">
+		insert into
+		hall_module(meet_hall_id,meet_id,module_id) values(
+			#{meetingHallId},
+			#{meetingId},
+			#{moduleId}
+		)
+	</insert>
+	<update id="updateHallModule" parameterType="hashMap">
+		UPDATE hall_module SET module_id = #{moduleId} WHERE meet_hall_id = #{meetingHallId} and meet_id = #{meetingId}
+	</update>
+		
+</mapper>

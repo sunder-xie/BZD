@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.mapper.ExceptionLogMapper">
+	<resultMap id="ExceptionLogMapperMap" type="com.bizideal.whoami.exception.entity.ExceptionLog">
+	    <id column="id" jdbcType="BIGINT" property="id" />
+	    <result column="controller_class_name" jdbcType="VARCHAR" property="controllerClassName" />
+	    <result column="controller_method_name" jdbcType="VARCHAR" property="controllerMethodName" />
+	    <result column="service_class_name" jdbcType="VARCHAR" property="serviceClassName" />
+	    <result column="service_method_name" jdbcType="VARCHAR" property="serviceMethodName" />
+	    <result column="resend_url" jdbcType="VARCHAR" property="resendUrl" />
+	    <result column="params" jdbcType="VARCHAR" property="params" />
+	    <result column="code" jdbcType="VARCHAR" property="code" />
+	    <result column="msg" jdbcType="VARCHAR" property="msg" />
+	    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+	    <result column="remark" jdbcType="VARCHAR" property="remark" />
+	    <result column="status" jdbcType="INTEGER" property="status" />
+	</resultMap>
+	<select id="queryExceptionLogs" parameterType="com.bizideal.whoami.exception.entity.ExceptionLog" resultMap="ExceptionLogMapperMap" >
+        SELECT * FROM exception_log WHERE 1 = 1 
+        <if test="null != controllerClassName &amp;&amp; controllerClassName.length() > 0" >
+            AND controller_class_name = #{controllerClassName}
+        </if>
+        <if test="null != controllerMethodName &amp;&amp; controllerMethodName.length() > 0" >
+            AND controller_method_name = #{controllerMethodName}
+        </if>         
+        <if test="null != serviceClassName &amp;&amp; serviceClassName.length() > 0" >
+            AND service_class_name = #{serviceClassName}
+        </if>
+        <if test="null != serviceMethodName &amp;&amp; serviceMethodName.length() > 0" >
+            AND service_method_name = #{serviceMethodName}
+        </if> 
+        <if test="null != code &amp;&amp; code.length() > 0" >
+            AND code = #{code}
+        </if> 
+        <if test="null != id &amp;&amp; id > 0" >
+            AND id = #{id}
+        </if>
+        
+        <if test="null != startDate &amp;&amp; startDate.length() > 0" >
+            AND CREATE_TIME &gt;= #{startDate}
+        </if>
+        <if test="null != endDate &amp;&amp; endDate.length() > 0" >
+            AND CREATE_TIME &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d 24:00:00')
+        </if>     
+        ORDER BY CREATE_TIME DESC
+    </select>
+
+	<delete id="delExceptionLogs" parameterType="com.bizideal.whoami.exception.entity.ExceptionLog">
+        DELETE FROM exception_log  WHERE 1 = 2 
+        <if test="null != controllerClassName &amp;&amp; controllerClassName.length() > 0" >
+            or controller_class_name = #{controllerClassName}
+        </if>
+        <if test="null != controllerMethodName &amp;&amp; controllerMethodName.length() > 0" >
+            or controller_method_name = #{controllerMethodName}
+        </if>         
+        <if test="null != serviceClassName &amp;&amp; serviceClassName.length() > 0" >
+            or service_class_name = #{serviceClassName}
+        </if>
+        <if test="null != serviceMethodName &amp;&amp; serviceMethodName.length() > 0" >
+            or service_method_name = #{serviceMethodName}
+        </if> 
+        <if test="null != code &amp;&amp; code.length() > 0" >
+            or code = #{code}
+        </if> 
+        <if test="null != id &amp;&amp; id > 0" >
+            or id = #{id}
+        </if>
+        
+        <if test="null != startDate &amp;&amp; startDate.length() > 0 &amp;&amp; null != endDate &amp;&amp; endDate.length() > 0" >
+            or ( AND CREATE_TIME &gt;= #{startDate} AND CREATE_TIME &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d 24:00:00') )
+        </if>
+    </delete>
+</mapper>

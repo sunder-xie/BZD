@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.core.meeting.mapper.MeetingGroupMapper">
+
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.facade.meeting.entity.MeetingGroups">
+    <id column="group_id" jdbcType="INTEGER" property="groupId" />
+    <id column="mee_id" jdbcType="INTEGER" property="meeId" />
+    <result column="group_name" jdbcType="VARCHAR" property="groupName" />
+    <result column="group_description" jdbcType="VARCHAR" property="groupDescription" />
+    <result column="group_is_public" jdbcType="VARCHAR" property="groupIsPublic" />
+    <result column="group_maxusers" jdbcType="VARCHAR" property="groupMaxusers" />
+    <result column="group_owner" jdbcType="VARCHAR" property="groupOwner" />
+    <result column="approval" jdbcType="VARCHAR" property="approval" />
+  </resultMap>
+  
+</mapper>

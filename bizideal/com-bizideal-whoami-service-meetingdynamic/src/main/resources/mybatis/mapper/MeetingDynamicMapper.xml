@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.mapper.MeetingDynamicMapper">
+
+	<resultMap id="MeetingDynamicResultMap" type="com.bizideal.whoami.meetingdynamic.entity.MeetingDynamic">
+		<id column="dynamic_id" jdbcType="INTEGER" property="dynamicId"/>
+	</resultMap>
+	
+  	<insert id="insertMeetingDynamic" parameterType="com.bizideal.whoami.meetingdynamic.entity.MeetingDynamic" useGeneratedKeys="true" keyProperty="dynamicId">
+		INSERT INTO meeting_dynamic (dynamic_id,meeting_id,meet_hall_id,dynamic_title,dynamic_url,
+		create_user,user_id,create_time,update_time,type,del_flag)
+		VALUES (null,#{meetingId},#{meetHallId},#{dynamicTitle},#{dynamicUrl},#{createUser},#{userId},
+		#{createTime},null,#{type},#{delFlag})
+	</insert>
+
+	<insert id="addBatchDynamic" useGeneratedKeys="true" parameterType="java.util.List">
+		<!-- </foreach>-->
+		INSERT INTO meeting_dynamic ( dynamic_id,meeting_id,meet_hall_id,dynamic_title,
+			 dynamic_url,create_user,update_user,user_id,create_time,update_time,type,del_flag)
+			 VALUES 
+		<foreach collection="list" item="item" index="index" separator="," >
+			 ( #{item.dynamicId},#{item.meetingId},#{item.meetHallId},#{item.dynamicTitle},
+			 #{item.dynamicUrl},#{item.createUser},#{item.updateUser},#{item.userId},#{item.createTime},
+			 #{item.updateTime},#{item.type},#{item.delFlag})
+		</foreach>
+	</insert>
+	
+	<select id="selectCurrentDynamics" parameterType="com.bizideal.whoami.meetingdynamic.entity.MeetingDynamic" 
+		resultType="com.bizideal.whoami.meetingdynamic.entity.MeetingDynamic">
+		select dynamic_id,meeting_id,meet_hall_id,dynamic_title,dynamic_url,create_user,
+			update_user,user_id,create_time,update_time,type,del_flag 
+		from meeting_dynamic 
+		where 1=1 and type='1' and del_flag='2' and meeting_id=#{meetingId} and meet_hall_id=#{meetHallId}
+	</select>
+	
+	<select id="selectDynamicByUrls" parameterType="java.util.List"
+			resultType="com.bizideal.whoami.meetingdynamic.entity.MeetingDynamic">
+		select dynamic_id,meeting_id,meet_hall_id,dynamic_title,dynamic_url,create_user,
+			update_user,user_id,create_time,update_time,type,del_flag 
+		from meeting_dynamic 
+			where meeting_id=#{meetingId} and dynamic_url in 
+	    <foreach collection="list" item="item" index="index"
+            open="(" close=")" separator=",">
+            #{item.dynamicUrl}
+        </foreach>
+	</select>
+	
+	<update id="updateBatchDynamic" parameterType="java.util.List">
+		update meeting_dynamic 
+	    	set del_flag =  0 
+	    where dynamic_id in 
+		<foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item.dynamicId}
+        </foreach>
+	</update>
+	
+	<delete id="deleteDynamicBatch" parameterType="com.bizideal.whoami.meetingdynamic.entity.MeetingDynamic" >
+		delete FROM meeting_dynamic 
+			where meeting_id=#{meetingId} 
+	</delete>
+</mapper>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.hotel.mapper.HotelUserLinkMapper">
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.facade.hotel.entity.HotelUserLink">
+    <id column="h_u_id" jdbcType="INTEGER" property="hUId" />
+    <result column="hotel_id" jdbcType="INTEGER" property="hotelId" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="meeting_id" jdbcType="INTEGER" property="meetingId" />
+    <result column="meeting_hall_id" jdbcType="INTEGER" property="meetingHallId" />
+    <result column="room_id" jdbcType="INTEGER" property="roomId" />
+    <result column="dsp" jdbcType="VARCHAR" property="dsp" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="name" jdbcType="VARCHAR" property="userName" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="unit" jdbcType="VARCHAR" property="unitName" />
+    <result column="room_type" jdbcType="VARCHAR" property="roomType" />
+    <result column="hotel_name" jdbcType="VARCHAR" property="hotelName" />
+  </resultMap>
+
+  
+  <update id="updateByHUId" parameterType="com.bizideal.whoami.facade.hotel.entity.HotelUserLink">
+  	update hotel_user_link 
+  	<set>
+        hotel_id = #{hotelId},
+        user_id = #{userId},
+        meeting_id = #{meetingId},
+        meeting_hall_id = #{meetingHallId},
+        room_id = #{roomId},
+        dsp = #{dsp}
+    </set>
+    <where> 
+    	h_u_id = #{hUId}
+    </where>
+  </update>
+  
+  <delete id="deleteByHUId" parameterType="java.lang.Integer">
+  	delete from hotel_user_link
+  	<where>
+  		h_u_id = #{hUId}
+  	</where>
+  </delete>
+
+  <delete id="deleteByHotelId" parameterType="java.lang.Integer">
+  	delete from hotel_user_link
+  	<where>
+  		hotel_id = #{hotelId}
+  	</where>
+  </delete>
+
+  <delete id="deleteByMeetingId" parameterType="java.lang.Integer">
+  	delete from hotel_user_link
+  	<where>
+  		meeting_id = #{meetingId}
+  	</where>
+  </delete>
+  
+  <select id="selectByHUId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	select
+  		hu.*,
+  		u.phone,
+  		uw.real_name name,
+  		uw.sex,
+  		uw.unionid unit,
+  		r.room_type,
+  		h.hotel_name
+  	from hotel_user_link hu
+  	left outer join user_info u on u.user_id=hu.user_id
+  	left outer join user_weixin_info uw on uw.user_id=hu.user_id
+  	left outer join room_info r on hu.room_id=r.room_id
+  	left outer join hotel_info h on hu.hotel_id=h.hotel_id
+  	<where>
+  		hu.h_u_id = #{hUId}
+  	</where>
+  	limit 1
+  </select>
+  
+  <select id="selectByHotelId" resultMap="BaseResultMap">
+  	select
+  		hu.*,
+  		u.phone,
+  		uw.real_name name,
+  		uw.sex,
+  		uw.unionid unit,
+  		r.room_type
+  	from hotel_user_link hu
+  	left outer join user_info u on u.user_id=hu.user_id
+  	left outer join user_weixin_info uw on uw.user_id=hu.user_id
+  	left outer join room_info r on hu.room_id=r.room_id
+  	<where>
+  		hu.hotel_id=#{hotelId}
+  		<if test="queryString != null">
+  			and ( 
+  			u.phone like CONCAT("%",#{queryString},"%")
+  			or uw.real_name like CONCAT("%",#{queryString},"%")
+  			or uw.sex like CONCAT("%",#{queryString},"%")
+  			or uw.unionid like CONCAT("%",#{queryString},"%")
+  			or r.room_type like CONCAT("%",#{queryString},"%"))
+  		</if>
+  	</where>
+  </select>
+  
+  <select id="selectByMeetingId" resultMap="BaseResultMap">
+  	select
+  		hu.*,
+  		u.phone,
+  		uw.real_name name,
+  		uw.sex,
+  		uw.unionid unit,
+  		r.room_type,
+  		h.hotel_name
+  	from hotel_user_link hu
+  	left outer join user_info u on u.user_id=hu.user_id
+  	left outer join user_weixin_info uw on uw.user_id=hu.user_id
+  	left outer join room_info r on hu.room_id=r.room_id
+  	left outer join hotel_info h on hu.hotel_id=h.hotel_id
+  	<where>
+  		hu.meeting_id=#{meetingId}
+  		<if test="queryString != null">
+  			and (u.phone like CONCAT("%",#{queryString},"%")
+  			or uw.real_name like CONCAT("%",#{queryString},"%")
+  			or uw.sex like CONCAT("%",#{queryString},"%")
+  			or uw.unionid like CONCAT("%",#{queryString},"%")
+  			or r.room_type like CONCAT("%",#{queryString},"%")
+  			or h.hotel_name like CONCAT("%",#{queryString},"%"))
+  		</if>
+  	</where>
+  </select>
+  
+  <select id="selectByMeetingIdAndUserId" resultMap="BaseResultMap">
+  	select
+  		hu.*,
+  		u.phone,
+  		uw.real_name name,
+  		uw.sex,
+  		uw.unionid unit,
+  		r.room_type,
+  		h.hotel_name
+  	from hotel_user_link hu
+  	left outer join user_info u on u.user_id=hu.user_id
+  	left outer join user_weixin_info uw on uw.user_id=hu.user_id
+  	left outer join room_info r on hu.room_id=r.room_id
+  	left outer join hotel_info h on hu.hotel_id=h.hotel_id
+  	<where>
+  		hu.meeting_id=#{meetingId}
+  		and hu.user_id=#{userId}
+  	</where>
+  </select>
+  
+</mapper>

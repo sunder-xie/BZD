@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bizideal.whoami.mapper.VoteInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.vote.entity.VoteInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="meeting_id" property="meetingId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="dsp" property="dsp" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="BIGINT" />
+    <result column="start_time" property="startTime" jdbcType="BIGINT" />
+    <result column="end_time" property="endTime" jdbcType="BIGINT" />
+    <result column="create_user_id" property="createUserId" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="TINYINT" />
+    <result column="empty_flag" property="emptyFlag" jdbcType="TINYINT" />
+  </resultMap>
+  
+  <insert id="insertVoteInfo" parameterType="com.bizideal.whoami.vote.entity.VoteInfo" useGeneratedKeys="true" keyProperty="id">
+  	insert into vote_info 
+	  	<trim prefix="(" suffix=")" suffixOverrides=",">
+	  		<if test="meetingId!=null">meeting_id,</if>
+	  		<if test="type!=null">type,</if>
+	  		<if test="dsp!=null">dsp,</if>
+	  		<if test="createTime!=null">create_time,</if>
+	  		<if test="startTime!=null">start_time,</if>
+	  		<if test="endTime!=null">end_time,</if>
+	  		<if test="createUserId!=null">create_user_id,</if>
+	  	</trim>
+	  	values 
+	  	<trim prefix="(" suffix=")" suffixOverrides=",">
+	  		<if test="meetingId!=null">#{meetingId},</if>
+	  		<if test="type!=null">#{type},</if>
+	  		<if test="dsp!=null">#{dsp},</if>
+	  		<if test="createTime!=null">#{createTime},</if>
+	  		<if test="startTime!=null">#{startTime},</if>
+	  		<if test="endTime!=null">#{endTime},</if>
+	  		<if test="createUserId!=null">#{createUserId},</if>
+	  	</trim>
+  </insert>
+  
+  <select id="selectOverdueVote" resultMap="BaseResultMap">
+  	select * from vote_info where end_time<![CDATA[ + ]]>30*24*60*60*1000 <![CDATA[ < ]]> #{time} and empty_flag=0 and type=#{type}
+  </select>
+  
+  <update id="updateEmptyFlag">
+  	update vote_info 
+  	<set>
+  		empty_flag=1
+  		<where>
+  			id in
+  			<foreach collection="list" item="vote" index="index" open="(" close=")" separator=",">
+				#{vote.id}
+			</foreach>
+  		</where>
+  	</set>
+  </update>
+  
+</mapper>

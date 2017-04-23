@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bizideal.whoami.member.mapper.MemberUnitInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.member.entity.MemberUnitInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="hall_id" property="hallId" jdbcType="INTEGER" />
+    <result column="unit_name" property="unitName" jdbcType="VARCHAR" />
+    <result column="member_type_id" property="memberTypeId" jdbcType="INTEGER" />
+    <result column="dsp" property="dsp" jdbcType="VARCHAR" />
+    <result column="type_name" property="typeName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectListByHallIdAndString" resultMap="BaseResultMap">
+  	select u.*,t.name type_name
+  	from member_unit_info u
+  	left outer join member_type_info t on
+  		u.member_type_id=t.id
+  	<where>
+  		u.hall_id=#{hallId}
+  		<if test="str!=null">
+  			and (u.unit_name like CONCAT("%",#{str},"%") 
+  			or t.name like CONCAT("%",#{str},"%"))
+  		</if>
+  	</where>
+  </select>
+  
+  	<insert id="insertList">
+		insert into member_unit_info (
+			hall_id,
+			unit_name,
+			member_type_id,
+			dsp
+		)values
+			<foreach collection="list" item="u" index="index" separator=",">
+				(#{u.hallId},#{u.unitName},#{u.memberTypeId},#{u.dsp})
+			</foreach>
+	</insert>
+	
+	<select id="selectListByMeeId" resultMap="BaseResultMap">
+		select u.* 
+		from member_unit_info u
+		<where>
+			u.member_type_id in(
+				select r.member_type_id
+				from role r
+				<where>
+					r.meet_id=#{meeId} 
+					and r.type=0
+				</where>
+			)
+			<if test="str!=null">
+  			and u.unit_name like CONCAT("%",#{str},"%") 
+  		</if>
+		</where>
+	</select>
+</mapper>

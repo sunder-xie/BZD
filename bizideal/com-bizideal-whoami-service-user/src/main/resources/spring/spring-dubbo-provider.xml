@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans.xsd  
+            http://code.alibabatech.com/schema/dubbo 
+            http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<!-- 提供方应用信息，用于计算依赖关系 -->
+	<dubbo:application name="user-provider" owner="programmer"
+		organization="dubbox" />
+
+	<!-- 使用zookeeper注册中心暴露服务地址  register="false"-->
+	<dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}" />
+
+	<!-- 监控中心配置，protocol="registry"，表示从注册中心发现监控中心地址 -->
+	<dubbo:monitor protocol="registry" />
+
+	<dubbo:protocol name="dubbo" serialization="kryo" port="${dubbo.rpc.user.port}" host="${dubbo.protocol.host}"/>
+
+	<!-- 和本地bean一样实现服务 -->
+	<!-- 声明需要暴露的服务接口 -->
+	<!-- 账户管理 -->
+	<dubbo:service interface="com.bizideal.whoami.user.facade.UserWeixinInfoFacade"
+		ref="userWeixinInfoFacade" protocol="dubbo" timeout="5000" />
+
+	<dubbo:service interface="com.bizideal.whoami.user.facade.UserInfoFacade"
+		ref="userInfoFacade" protocol="dubbo" timeout="5000" />
+		
+	<!-- 好友 -->
+	<dubbo:service interface="com.bizideal.whoami.user.facade.HuanxinFriendFacade"
+		ref="huanxinFriendFacade" protocol="dubbo" timeout="5000" />
+
+	<!-- <dubbo:provider filter="myCorsFilter" /> -->
+
+	<!-- use tomcat server -->
+	<dubbo:protocol name="rest" host="${dubbo.protocol.host}" port="${dubbo.restful.user.port}"
+		threads="500" contextpath="whoami-user" server="tomcat" accepts="500"
+		extension="com.bizideal.whoami.filter.DubboxRestCORSFilter,com.alibaba.dubbo.rpc.protocol.rest.support.LoggingFilter,com.bizideal.whoami.user.exception.MyExceptionMapper" />
+		
+	<dubbo:service interface="com.bizideal.whoami.user.facade.UserWeixinInfoRestFacade"
+		ref="userWeixinInfoRestFacade" protocol="rest" validation="true" timeout="5000" />
+	<dubbo:service interface="com.bizideal.whoami.user.facade.UserInfoRestFacade"
+		ref="userInfoRestFacade" protocol="rest" validation="true" timeout="5000" />
+	<dubbo:service interface="com.bizideal.whoami.user.facade.HuanxinFriendRestFacade"
+		ref="huanxinFriendRestFacade" protocol="rest" validation="true" timeout="5000" />
+	<dubbo:service interface="com.bizideal.whoami.user.facade.UserGroupRestFacade"
+		ref="userGroupRestFacade" protocol="rest" validation="true" timeout="5000" />
+
+</beans>  

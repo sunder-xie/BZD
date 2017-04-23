@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans.xsd  
+            http://code.alibabatech.com/schema/dubbo 
+            http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+            
+	<!-- dubbox消费者信息 -->
+	<dubbo:application name="message-consumer" owner="programmer" organization="dubbox" />
+	<!-- 注册中心 -->
+	<dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}" />
+	
+	<!-- 用户模块 url="dubbo://10.1.0.23:20881"-->
+	<dubbo:reference id="userWeixinInfoFacade" timeout="5000" interface="com.bizideal.whoami.user.facade.UserWeixinInfoFacade" check="false"/>
+
+	<!-- 会议服务模块url="dubbo://10.1.0.23:20889" -->
+	<dubbo:reference id="hotelUserLinkFacade" timeout="5000" interface="com.bizideal.whoami.facade.hotel.facade.HotelUserLinkFacade" check="false"/>
+
+	<!-- 会议模块  url="dubbo://10.1.0.23:20882"-->
+	<dubbo:reference id="meetingUserGroupFacade" timeout="5000" interface="com.bizideal.whoami.facade.meeting.service.MeetingUserGroupFacade" check="false"/>
+
+	<!-- 可靠消息模块  url="dubbo://10.1.0.23:20897"-->
+	<dubbo:reference id="transactionMessageService" timeout="5000" interface="com.bizideal.whoami.message.service.TransactionMessageService" check="false"/>
+</beans>  

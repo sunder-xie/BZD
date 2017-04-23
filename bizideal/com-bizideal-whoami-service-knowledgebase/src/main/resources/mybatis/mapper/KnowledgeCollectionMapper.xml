@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bizideal.whoami.knowledgebase.mapper.KnowledgeCollectionMapper" >
+  <resultMap id="BaseCollectionResultMap" type="com.bizideal.whoami.knowledgebase.entity.KnowledgeCollection" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="mee_id" property="meeId" jdbcType="INTEGER" />
+    <result column="type_url" property="typeUrl" jdbcType="VARCHAR" />
+    <result column="file_id" property="fileId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="collection_time" property="collectionTime" jdbcType="BIGINT" />
+  </resultMap>
+  
+  <!-- 模糊查询我的收藏 -->
+  <select id="selectMyCollectionsByUserId" parameterType="com.bizideal.whoami.knowledgebase.entity.KnowledgeCollection" resultMap="com.bizideal.whoami.knowledgebase.mapper.KnowledgeFileMapper.BaseFileResultMap">
+  	SELECT kf.*,kc.type_url,kc.collection_time,1 as isCollected FROM knowledge_collection kc LEFT JOIN knowledge_file kf ON kc.file_id = kf.id
+  	 WHERE kc.user_id = #{userId}
+  	 	<if test="typeUrl != null &amp;&amp; typeUrl != ''">
+  	 		AND kf.name LIKE CONCAT("%",#{typeUrl},"%")
+  	 	</if>
+  	  AND kf.del_flag = 0 ORDER BY kc.collection_time DESC
+  </select>
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.hotel.mapper.HotelInfoMapper">
+  <resultMap id="HotelInfoMap" type="com.bizideal.whoami.facade.hotel.entity.HotelInfo">
+
+    <id column="hotel_id" jdbcType="INTEGER" property="hotelId" />
+    <result column="hotel_name" jdbcType="VARCHAR" property="hotelName" />
+    <result column="meeting_hall_id" jdbcType="INTEGER" property="meetingHallId" />
+    <result column="meeting_id" jdbcType="INTEGER" property="meetingId" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="person" jdbcType="VARCHAR" property="person" />
+    <result column="tel" jdbcType="VARCHAR" property="tel" />
+    <result column="del_flag" jdbcType="CHAR" property="delFlag" />
+    <result column="dsp" jdbcType="VARCHAR" property="dsp" />
+  </resultMap>
+
+  <resultMap id="HotelQueryMap" type="com.bizideal.whoami.facade.hotel.entity.HotelInfo">
+
+    <id column="hotel_id" jdbcType="INTEGER" property="hotelId" />
+    <result column="hotel_name" jdbcType="VARCHAR" property="hotelName" />
+    <result column="meeting_hall_id" jdbcType="INTEGER" property="meetingHallId" />
+    <result column="meeting_id" jdbcType="INTEGER" property="meetingId" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="person" jdbcType="VARCHAR" property="person" />
+    <result column="tel" jdbcType="VARCHAR" property="tel" />
+    <result column="del_flag" jdbcType="CHAR" property="delFlag" />
+    <result column="dsp" jdbcType="VARCHAR" property="dsp" />
+    <result column="room_sum" jdbcType="VARCHAR" property="roomSum" />
+  </resultMap>
+  
+  <!-- 添加酒店信息 -->
+  <insert id="insertHotelInfo" parameterType="com.bizideal.whoami.facade.hotel.entity.HotelInfo" >
+	insert into hotel_info (
+		hotel_name, 
+		meeting_hall_id, 
+   		meeting_id, 
+   		address, 
+   		person, 
+   		tel, 
+   		del_flag, 
+   		dsp
+    )values 
+ 		(
+ 		#{hotelName}, 
+ 		#{meetingHallId}, 
+   		#{meetingId}, 
+   		#{address}, 
+   		#{person}, 
+   		#{tel}, 
+   		0, 
+   		#{dsp}
+   	)
+  </insert>
+  
+  <!-- 修改酒店信息 -->
+  <update id="updateHotelInfo" parameterType="com.bizideal.whoami.facade.hotel.entity.HotelInfo">
+  	update hotel_info 
+	<set>
+  		hotel_name=#{hotelName}, 
+		meeting_hall_id=#{meetingHallId}, 
+   		meeting_id=#{meetingId}, 
+   		address=#{address},  
+   		person=#{person}, 
+   		tel=#{tel}, 
+   		dsp=#{dsp}
+   	<where>
+   		hotel_id=#{hotelId}
+   	</where>
+   	</set>
+  </update>
+  
+  <!-- 根据酒店id删除酒店信息 -->
+  <update id="deleteHotelInfoById" parameterType="java.lang.Integer">
+  	update hotel_info
+  	<set>
+  		del_flag=1
+  		<where>
+  			hotel_id=#{hotelId}
+  		</where>
+  	</set>
+  </update>
+  
+  <select id="selectHotelInfoByHotelId" parameterType="java.lang.Integer" resultMap="HotelQueryMap">
+  	select 
+			h.*,
+			sum(r.room_number) room_sum
+		from hotel_info h
+		left outer join room_info r on r.hotel_id=h.hotel_id and r.del_flag=0
+   	<where>
+   		h.hotel_id=#{hotelId} and h.del_flag=0
+   	</where>
+   	group by h.hotel_id
+   	limit 1
+  </select>
+  
+  <select id="selectHotelInfoByMeetingIdAndLikeHotelName" resultMap="HotelQueryMap">
+  	select 
+			h.*,
+			sum(r.room_number) room_sum
+		from hotel_info h
+		left outer join room_info r on r.hotel_id=h.hotel_id and r.del_flag=0
+   	<where>
+   		h.meeting_id=#{meetingId} and h.del_flag=0
+   		<if test="hotelName!=null">
+   			and h.hotel_name like CONCAT("%",#{hotelName},"%")
+   		</if>
+   	</where>
+   	group by h.hotel_id
+  </select>
+  
+  <select id="verifyHotelName" resultMap="HotelInfoMap">
+  	select
+  		hotel_id, 
+		hotel_name, 
+		meeting_hall_id, 
+   		meeting_id, 
+   		address, 
+   		person, 
+   		tel, 
+   		del_flag, 
+   		dsp
+   	from hotel_info
+   	<where>
+   		meeting_id=#{meetingId} and hotel_name=#{hotelName} and del_flag=0
+   	</where>
+   	limit 1
+  </select>
+
+	<select id="hotelListQuery" resultMap="HotelQueryMap" parameterType="java.lang.Integer">
+		select 
+			h.*,
+			sum(r.room_number) room_sum
+		from hotel_info h
+		left outer join room_info r on r.hotel_id=h.hotel_id and r.del_flag=0
+		where h.meeting_id=#{meetingId} and h.del_flag=0
+		group by h.hotel_id
+	</select>
+</mapper>

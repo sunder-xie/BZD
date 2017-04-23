@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans.xsd  
+            http://code.alibabatech.com/schema/dubbo 
+            http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+   
+    <!-- 和本地bean一样实现服务 -->
+	<!-- 声明需要暴露的服务接口 -->
+	<!-- 账户管理 -->
+	<!-- dubbo:service cluster="failfast/failover" 配置集群容错  retries="2" 写操作failfast 不重试 读操作failover 重试2次 -->
+	<!-- <dubbo:service interface="com.bizideal.whoami.demo.facade.DemoFacade" ref="demoFacade" protocol="dubbo" /> -->
+	<dubbo:service interface="com.bizideal.whoami.facade.hotel.facade.HotelInfoFacade" ref="hotelInfoFacade" protocol="dubbo" />
+	<dubbo:service interface="com.bizideal.whoami.facade.hotel.facade.HotelUserLinkFacade" ref="hotelUserLinkFacade" protocol="dubbo" />
+	<dubbo:service interface="com.bizideal.whoami.facade.hotel.facade.RoomInfoFacade" ref="roomInfoFacade" protocol="dubbo" />
+	<dubbo:service interface="com.bizideal.whoami.facade.hotel.facade.RoomTypeInfoFacade" ref="roomTypeInfoFacade" protocol="dubbo" />
+	<!-- use tomcat server -->
+    <!-- <dubbo:protocol name="rest" host="${dubbo.protocol.host}" port="${dubbo.restful.demo.port}" threads="500" contextpath="whoami" server="tomcat" accepts="500"
+                    extension="com.bizideal.whoami.filter.DubboxRestCORSFilter,com.alibaba.dubbo.rpc.protocol.rest.support.LoggingFilter"/> -->
+    <!-- <dubbo:service interface="com.bizideal.whoami.demo.facade.DemoRestFacade" ref="demoRestFacade" protocol="rest" 
+     validation="true"/> -->
+
+</beans> 

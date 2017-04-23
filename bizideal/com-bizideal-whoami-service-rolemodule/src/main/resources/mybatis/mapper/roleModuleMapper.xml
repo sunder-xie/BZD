@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.rolemodule.mapper.RoleModuleMapper">
+
+	<resultMap type="com.bizideal.whoami.rolemodule.entity.Role"
+		id="role">
+		<id column="role_id" property="roleId" />
+		<result column="role_name" jdbcType="VARCHAR" property="roleName" />
+		<result column="role_type" jdbcType="VARCHAR" property="roleType" />
+		<result column="role_remark" jdbcType="VARCHAR" property="roleRemark" />
+		<result column="meet_hall_id" property="meetHallId" />
+		<result column="role_status" property="roleStatus" />
+		<result column="meet_id" property="meetId" />
+		<result column="member_type_id" property="member_type_id" />
+		<result column="type" property="type" />
+		
+	</resultMap>
+	<resultMap type="com.bizideal.whoami.rolemodule.entity.Role"
+		id="roleModuleMap" extends="role">
+		<collection property="modules"
+			ofType="com.bizideal.whoami.rolemodule.entity.Module">
+
+			<id property="moduleId" column="module_id" />
+			<result property="moduleName" column="module_name" />
+			<result property="moduleRemark" column="module_remark" />
+			<result property="moduleType" column="module_type" />
+			<result property="moduleUrl" column="module_url" />
+			<result property="moduleStatus" column="module_status" />
+			<result property="moduleIconSrc" column="module_icon_src" />
+
+		</collection>
+	</resultMap>
+	
+
+	<resultMap id="roleMap" type="com.bizideal.whoami.rolemodule.entity.Role">
+		<id column="role_id" property="roleId" />
+		<result column="role_name" jdbcType="VARCHAR" property="roleName" />
+		<result column="role_type" jdbcType="VARCHAR" property="roleType" />
+		<result column="role_remark" jdbcType="VARCHAR" property="roleRemark" />
+		<result column="meet_hall_id" property="meetHallId" />
+		<result column="role_status" property="roleStatus" />
+		<result column="meet_id" property="meetId" />
+		<collection ofType="com.bizideal.whoami.rolemodule.entity.Module"
+			property="modules" javaType="java.util.ArrayList" column="role_id"
+			select="selectModules">
+		</collection>
+	</resultMap>
+	<resultMap type="com.bizideal.whoami.rolemodule.entity.Role"
+		id="roleModuleMapModul" extends="role">
+		<result property="modulesListString" column="module_id" />
+	</resultMap>
+
+
+
+
+	<select id="selectModules" parameterType="int"
+		resultType="com.bizideal.whoami.rolemodule.entity.Module">
+		select * from module where module_id in (
+		select module_id
+		from role_module
+		where role_id=#{role_id}
+		)
+	</select>
+
+
+	<select id="findById" parameterType="int" resultMap="roleMap">
+		select *
+		from role where role_id=#{id}
+	</select>
+
+	<select id="findByRoleModuleId" parameterType="int" resultMap="roleModuleMapModul">
+		SELECT
+			r.*,
+			rm.module_id
+		FROM
+			role r
+		  LEFT JOIN role_module rm ON r.role_id = rm.role_id
+		WHERE
+			r.role_id = #{id}
+	</select>
+
+	<select id="findRoleModule" parameterType="hashMap" resultType="int">
+		select count(*) from role_module where
+		role_id=#{role_id,jdbcType=NUMERIC} and
+		module_id=#{module_id,jdbcType=NUMERIC}
+	</select>
+
+
+	<select id="getRoleByCondition" resultMap="role">
+		select * from role where 1=1
+		<if test="roleType!=null &amp;&amp; roleType.length()>0">
+			and role_type =#{roleType,jdbcType=VARCHAR}
+		</if>
+		<if test="meetid>0">
+			and meet_id=#{meetid}
+		</if>
+	</select>
+
+
+
+
+	<insert id="saveRoleModules" parameterType="hashMap">
+		insert into
+		role_module(role_id,module_id) values(
+		#{role_id,jdbcType=NUMERIC},
+		#{module_id,jdbcType=NUMERIC}
+		)
+	</insert>
+
+	 <insert id="batchsaveRoleModules" parameterType="hashMap">
+		insert into role_module(role_id,module_id) values(
+			#{role_id,jdbcType=NUMERIC},
+			#{module_id,jdbcType=NUMERIC}
+		)		
+	</insert> 
+	<update id="batchupdateRoleModules" parameterType="hashMap">
+		UPDATE role_module
+			SET  module_id = #{module_id,jdbcType=NUMERIC}
+		WHERE
+			role_id = #{role_id,jdbcType=NUMERIC}	 	
+	</update>
+	
+	<delete id="deleteRoleModules" parameterType="int">
+		delete from
+		role_module where role_id=#{role_id}
+	</delete>
+
+	<resultMap type="com.bizideal.whoami.rolemodule.entity.Role"
+		id="roleModulePersonalMap" extends="role">
+		<association property="rolePersonal"
+			javaType="com.bizideal.whoami.rolemodule.entity.RolePersonal">
+			<id property="rolePersonalId" column="role_personal_id" />
+			<result property="roleId" column="rp_role_id" />
+			<result property="cost" column="cost" />
+		</association>
+		<collection property="modules"
+			ofType="com.bizideal.whoami.rolemodule.entity.Module">
+
+			<id property="moduleId" column="module_id" />
+			<result property="moduleName" column="module_name" />
+			<result property="moduleRemark" column="module_remark" />
+			<result property="moduleType" column="module_type" />
+			<result property="moduleUrl" column="module_url" />
+			<result property="moduleStatus" column="module_status" />
+			<result property="moduleIconSrc" column="module_icon_src" />
+
+		</collection>
+		
+	</resultMap>
+	
+	<!-- <select id="findByRoleModulePersonal" parameterType="int"
+		resultMap="roleModulePersonalMap">
+		SELECT
+		r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_remark,r.role_status,
+		r.meet_id,m.module_id,m.module_name,m.module_remark,m.module_type,m.module_url,
+		m.module_status,m.module_icon_src,rp.cost,rp.role_personal_id,rp.role_id
+		as rp_role_id
+		from role r left
+		join role_module rm on
+		r.role_id=rm.role_id left join module m on
+		rm.module_id=m.module_id
+		left join role_personal rp on r.role_id=rp.role_id
+		where r.role_id =#{roleid}
+	</select> -->
+	
+	
+	
+	<!-- <resultMap type="com.bizideal.whoami.rolemodule.entity.Role"
+		id="roleModuleUnitMap" extends="role">
+		<association property="roleUnit"
+			javaType="com.bizideal.whoami.rolemodule.entity.RoleUnit">
+			<id property="roleUnitId" column="role_unit_id" />
+			<result property="roleId" column="ru_role_id" />
+			<result property="cost" column="cost" />
+			<result property="peopleNumber" column="people_number" />
+			
+		</association>
+		<collection property="modules"
+			ofType="com.bizideal.whoami.rolemodule.entity.Module">
+
+			<id property="moduleId" column="module_id" />
+			<result property="moduleName" column="module_name" />
+			<result property="moduleRemark" column="module_remark" />
+			<result property="moduleType" column="module_type" />
+			<result property="moduleUrl" column="module_url" />
+			<result property="moduleStatus" column="module_status" />
+			<result property="moduleIconSrc" column="module_icon_src" />
+
+		</collection>
+	</resultMap> -->
+	<!-- <select id="findByRoleModuleUnit" parameterType="int"
+		resultMap="roleModuleUnitMap">
+		SELECT
+		r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_remark,r.role_status,
+		r.meet_id,m.module_id,m.module_name,m.module_remark,m.module_type,m.module_url,
+		m.module_status,m.module_icon_src,ru.cost,ru.role_unit_id,ru.role_id
+		as ru_role_id,ru.people_number
+		from role r left
+		join role_module rm on
+		r.role_id=rm.role_id left join module m on
+		rm.module_id=m.module_id
+		left join role_unit ru on r.role_id=ru.role_id
+		where r.role_id =#{roleid}
+	</select> -->
+	
+	
+	
+	
+	<!-- <select id="findRoleByUserIdHallId"  resultMap="roleModuleMap">
+		SELECT r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_status,
+		r.role_remark,m.module_id,m.module_name,m.module_remark,m.module_type,
+		m.module_url,m.module_status,m.module_icon_src,r.meet_id
+		from role r left
+		join
+		role_module rm on
+		r.role_id=rm.role_id left join module m on
+		rm.module_id=m.module_id
+		where r.role_id = (select role_id from user_role_link 
+		where user_id=#{userid} and meeting_id=#{meetid})
+
+	</select> -->
+	<select id="findRoleByUserIdHallId"  resultMap="roleModuleMapModul">
+		SELECT
+			r.role_name,
+			r.role_id,
+			r.role_type,
+			r.meet_hall_id,
+			r.role_status,
+			r.role_remark,
+			rm.module_id,
+			r.meet_id
+		FROM
+			role r
+		LEFT JOIN role_module rm ON r.role_id = rm.role_id
+		WHERE
+			r.role_id = (
+				SELECT
+					role_id
+				FROM
+					user_role_link
+				WHERE
+					user_id = 
+					#{userid}
+					and
+					meeting_id=#{meetid}
+		)
+	</select>
+	
+	
+	
+	<!-- <select id="findRoleModulePersonalByUseridHallId"
+		resultMap="roleModulePersonalMap">
+		SELECT
+		r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_remark,r.role_status,
+		r.meet_id,m.module_id,m.module_name,m.module_remark,m.module_type,m.module_url,
+		m.module_status,m.module_icon_src,rp.cost,rp.role_personal_id,rp.role_id
+		as rp_role_id
+		from role r left
+		join role_module rm on
+		r.role_id=rm.role_id left join module m on
+		rm.module_id=m.module_id
+		left join role_personal rp on r.role_id=rp.role_id
+		where r.role_id =(select role_id from user_role_link 
+		where user_id=#{userid} and meeting_id=#{meetid})
+		
+	</select> -->
+	
+	
+	
+		<!-- <select id="findRoleModuleUnitByUseridHallId" resultMap="roleModuleUnitMap">
+		SELECT
+		r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_remark,r.role_status,
+		r.meet_id,m.module_id,m.module_name,m.module_remark,m.module_type,m.module_url,
+		m.module_status,m.module_icon_src,ru.cost,ru.role_unit_id,ru.role_id
+		as ru_role_id,ru.people_number
+		from role r left
+		join role_module rm on
+		r.role_id=rm.role_id left join module m on
+		rm.module_id=m.module_id
+		left join role_unit ru on r.role_id=ru.role_id
+		where r.role_id =(select role_id from user_role_link 
+		where user_id=#{userid} and meeting_id=#{meetid})
+	    </select> -->
+	
+	<select id="getManagerUserIdByhallid" parameterType="int" resultType="string" >
+		select user_id from user_role_link where role_id in (
+		select role_id from role where meet_id=#{meetid} 
+		and role_type='manager')
+	</select>
+	
+	
+	
+	
+		
+
+	<!-- <select id="getDefaultJoiner"  resultMap="roleModuleMap">
+		SELECT r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_status,r.meet_id,
+		r.role_remark,m.module_id,m.module_name,m.module_remark,m.module_type,
+		m.module_url,m.module_status,m.module_icon_src
+		from role r left
+		join
+		role_module rm on
+		r.role_id=rm.role_id left join module m on
+		rm.module_id=m.module_id
+		where  r.role_status='default' and r.role_type='joiner' and r.meet_id=#{meetid}
+
+	</select> -->
+	
+	
+	<!-- 根据主会议id查询用户角色权限  传入  meet_id 、user_id-->
+	<!-- <select id="findRoleByUserIdHallIdMeetId"  resultMap="roleModuleMap">
+		SELECT r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_status,r.meet_id,
+		r.role_remark,m.module_id,m.module_name,m.module_remark,m.module_type,
+		m.module_url,m.module_status,m.module_icon_src
+		from role r left
+		join
+		role_module rm on
+		r.role_id=rm.role_id left join (select * from module where module_id in (select module_id from hall_module where meet_id=#{meetid})) m on
+		rm.module_id=m.module_id
+		where r.role_id = (select role_id from user_role_link 
+		where user_id=#{userid} and meet_id=#{meetid})
+
+	</select> -->
+	
+	
+	
+	<select id="existRoleName" resultMap="role">
+		select * from role where role_name=#{roleName} and meet_id=#{meetId} and type = #{type}
+	</select>
+	
+	<select id="existRoleNameManage" resultMap="role">
+		select * from role where role_name=#{roleName} and meet_id=#{meetId} and type is null
+	</select>
+	
+	
+	<!-- <select id="getDefaultSignByMeetId"  resultMap="roleModuleMap">
+		
+		SELECT r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_status,r.meet_id,
+		r.role_remark,m.module_id,m.module_name,m.module_remark,m.module_type,
+		m.module_url,m.module_status,m.module_icon_src
+		from role r left
+		join
+		role_module rm on
+		r.role_id=rm.role_id left join (select * from module where module_id in (select module_id from hall_module where meet_id=#{meetid})) m on
+		rm.module_id=m.module_id
+		where  r.role_status='default' and r.role_type='joiner' and r.meet_id=#{meetid}  and r.role_name='已报名'
+
+	</select> -->
+	<select id="getDefaultSignByMeetId"  resultMap="roleModuleMapModul">	
+		SELECT
+			r.role_name,
+			r.role_id,
+			r.role_type,
+			r.meet_hall_id,
+			r.role_status,
+			r.meet_id,
+			r.role_remark,
+			rm.module_id
+		FROM
+			role r
+		  LEFT JOIN role_module rm ON r.role_id = rm.role_id
+		WHERE
+			r.role_status = 'default'
+			AND r.role_type = 'joiner'
+			AND r.meet_id = #{meetid} 
+			AND r.role_name = '已报名'
+	</select>
+	
+	<!-- 
+	<select id="getDefaultNoSignByMeetId"  resultMap="roleModuleMap">
+		
+		SELECT r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_status,r.meet_id,
+		r.role_remark,m.module_id,m.module_name,m.module_remark,m.module_type,
+		m.module_url,m.module_status,m.module_icon_src
+		from role r left
+		join
+		role_module rm on
+		r.role_id=rm.role_id left join (select * from module where module_id in (select module_id from hall_module where meet_id=#{meetid})) m on
+		rm.module_id=m.module_id
+		where  r.role_status='default' and r.role_type='joiner' and r.meet_id=#{meetid} and r.role_name='未报名'
+
+	</select> -->
+	<select id="getDefaultNoSignByMeetId"  resultMap="roleModuleMapModul">
+		SELECT
+			r.role_name,
+			r.role_id,
+			r.role_type,
+			r.meet_hall_id,
+			r.role_status,
+			r.meet_id,
+			r.role_remark,
+			rm.module_id
+		FROM
+			role r
+		  LEFT JOIN role_module rm ON r.role_id = rm.role_id
+		WHERE
+				r.role_status = 'default'
+				AND r.role_type = 'joiner'
+				AND r.meet_id = #{meetid} 
+				AND r.role_name = '未报名'
+	</select>
+	
+	<!-- <select id="getDefaultManagerByMeetId"  resultMap="roleModuleMap">
+		
+		SELECT r.role_name,r.role_id,r.role_type,r.meet_hall_id,r.role_status,r.meet_id,
+		r.role_remark,m.module_id,m.module_name,m.module_remark,m.module_type,
+		m.module_url,m.module_status,m.module_icon_src
+		from role r left
+		join
+		role_module rm on
+		r.role_id=rm.role_id left join (select * from module where module_id in (select module_id from hall_module where meet_id=#{meetid})) m on
+		rm.module_id=m.module_id
+		where  r.role_status='default' and r.role_type='manager' and r.meet_id=#{meetid} and r.role_name='管理员'
+
+	</select> -->
+	
+	<select id="getDefaultManagerByMeetId"  resultMap="roleModuleMapModul">	
+		SELECT
+			r.role_name,
+			r.role_id,
+			r.role_type,
+			r.meet_hall_id,
+			r.role_status,
+			r.meet_id,
+			r.role_remark,
+			rm.module_id
+		FROM
+			role r
+		  LEFT JOIN role_module rm ON r.role_id = rm.role_id
+		WHERE
+			r.role_status='default' and r.role_type='manager' and r.meet_id=#{meetid} and r.role_name='管理员'
+	</select>
+	
+	
+	<resultMap type="com.bizideal.whoami.rolemodule.Dto.RoleMemberDto"
+		id="roleMemberDto">
+		<id column="role_id" property="roleId" />
+		<result column="role_name" jdbcType="VARCHAR" property="roleName" />
+		<result column="role_type" jdbcType="VARCHAR" property="roleType" />
+		<result column="role_remark" jdbcType="VARCHAR" property="roleRemark" />
+		<result column="meet_hall_id" property="meetHallId" />
+		<result column="role_status" property="roleStatus" />
+		<result column="meet_id" property="meetId" />
+		<result column="member_type_id" property="member_type_id" />
+		<result column="type" property="type" />
+		<result column="cost" property="cost"/>
+	
+		<result column="people_number"  property="peopleNumber"/>
+		<result column="module_id" property="modulesListString"/>
+		
+	</resultMap>
+	<resultMap type="com.bizideal.whoami.rolemodule.Dto.RoleMemberDto"
+		id="roleMemberDtopersonal" extends="roleMemberDto">
+		<result column="role_personal_id" property="role_personal_id"/>
+	</resultMap>
+	<resultMap type="com.bizideal.whoami.rolemodule.Dto.RoleMemberDto"
+		id="roleMemberDtoUnit" extends="roleMemberDto">
+		<result column="role_unit_id" property="role_unit_id"/>
+	</resultMap>
+	
+	<!-- 根据member_type_id 查询个人role -->
+	<select id="getRoleModuleBymember_type_idpersonal" resultMap="roleMemberDtopersonal">
+			SELECT
+				r.role_name,
+				r.role_id,
+				r.role_type,
+				r.meet_hall_id,
+				r.role_remark,
+				r.role_status,
+				r.meet_id,
+				r.meet_hall_id,
+				r.type,
+				r.member_type_id,
+				rm.module_id,
+				ru.cost,
+				ru.role_personal_id
+			FROM
+				role r
+			LEFT JOIN role_module rm ON r.role_id = rm.role_id
+			LEFT JOIN role_personal ru ON r.role_id = ru.role_id
+				WHERE
+				r.member_type_id  = #{member_type_id}
+			and 
+				r.type = #{type}
+			and 
+				r.meet_id = #{meeId}
+	</select>
+	
+	<!-- 根据member_type_id 查询组织role -->
+	<select id="getRoleModuleBymember_type_idUnit" resultMap="roleMemberDtoUnit">
+			SELECT
+		r.role_name,
+		r.role_id,
+		r.role_type,
+		r.meet_hall_id,
+		r.role_remark,
+		r.role_status,
+		r.meet_id,
+		r.meet_hall_id,
+		r.type,
+		r.member_type_id,
+		rm.module_id,
+		ru.cost,
+		ru.people_number,
+		ru.role_unit_id
+	FROM
+		role r
+	LEFT JOIN role_module rm ON r.role_id = rm.role_id
+	LEFT JOIN role_unit ru ON r.role_id = ru.role_id
+		WHERE 
+		r.member_type_id  = #{member_type_id}
+	and 
+		r.type = #{type}
+	and 
+		r.meet_id = #{meeId}
+	</select>
+	
+
+</mapper>

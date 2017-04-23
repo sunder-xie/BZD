@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans  
+            http://www.springframework.org/schema/beans/spring-beans.xsd  
+            http://code.alibabatech.com/schema/dubbo 
+            http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+            
+	<!-- dubbox消费者信息 -->
+	<dubbo:application name="message-checkrecovery" owner="programmer" organization="dubbox" />
+	<!-- 注册中心 -->
+	<dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}" />
+	<!-- 可靠消息模块 -->
+	<dubbo:reference id="transactionMessageService" timeout="5000" interface="com.bizideal.whoami.message.service.TransactionMessageService" check="false" />
+	<!-- 报名主业务逻辑使用 -->
+	<dubbo:reference id="signUpInfoFacade" timeout="5000" interface=" com.bizideal.whoami.signup.facade.SignUpInfoFacade" check="false" />
+
+</beans>  

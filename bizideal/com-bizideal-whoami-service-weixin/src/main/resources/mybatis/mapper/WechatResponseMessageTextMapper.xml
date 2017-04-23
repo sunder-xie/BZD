@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.weixin.mapper.WechatResponseMessageTextMapper">
+
+  <select id="getResponseByKeyWords" resultType="com.bizideal.whoami.weixin.entity.WechatResponseMessageText" parameterType="string">
+        select * from wechat_response_message_text where req_key_words=#{reqKeyWords}
+   </select>
+   
+   <delete id="deleteRespByKey" parameterType="java.lang.String">
+		delete from wechat_response_message_text where req_key_words=#{reqKeywords}
+	</delete>
+
+</mapper>

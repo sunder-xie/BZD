@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.bizideal.whoami.hotel.mapper.RoomInfoMapper">
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.facade.hotel.entity.RoomInfo">
+    <id column="room_id" jdbcType="INTEGER" property="roomId" />
+    <result column="hotel_id" jdbcType="INTEGER" property="hotelId" />
+    <result column="room_type_id" jdbcType="INTEGER" property="roomTypeId" />
+    <result column="room_number" jdbcType="INTEGER" property="roomNumber" />
+    <result column="room_reserved" jdbcType="INTEGER" property="roomReserved" />
+    <result column="cost" jdbcType="DOUBLE" property="cost" />
+    <result column="dsp" jdbcType="VARCHAR" property="dsp" />
+    <result column="del_flag" jdbcType="CHAR" property="delFlag" />
+  </resultMap>
+  
+  <update id="updateRaiseRoomNum" parameterType="java.lang.Integer" >
+  	UPDATE room_info r SET r.normal_reserved_num=r.normal_reserved_num<![CDATA[ + ]]>#{raiseNum} WHERE r.room_id=#{roomId}
+  </update>
+  
+  <update id="updateReduceRoomNum" parameterType="java.lang.Integer" >
+  	UPDATE room_info r SET r.normal_reserved_num=r.normal_reserved_num<![CDATA[ - ]]>#{reduceNum} WHERE r.room_id=#{roomId}
+  </update>
+  
+  <update id="updateRaiseRoomNumReserved" parameterType="java.lang.Integer" >
+  	UPDATE room_info r SET r.spare_reserved_num=r.spare_reserved_num<![CDATA[ + ]]>#{raiseNum}
+  	WHERE r.room_id=#{roomId}
+  </update>
+  
+  <update id="updateReduceRoomNumReserved" parameterType="java.lang.Integer" >
+  	UPDATE room_info r SET r.spare_reserved_num=r.spare_reserved_num<![CDATA[ - ]]>#{reduceNum}
+  	WHERE r.room_id=#{roomId}
+  </update>
+  
+  <!-- <delete id="deleteByHotelId" parameterType="java.lang.Integer">
+  	delete from room_info where hotel_id=#{hotelId}
+  </delete> -->
+  <update id="deleteByHotelId" parameterType="java.lang.Integer">
+  	update room_info r set r.del_flag=1 where r.hotel_id=#{hotelId}
+  </update>
+  
+  <select id="selectHotelRoomList" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	select 
+  	r.* 
+  	from room_info r 
+  	<where>
+  		r.hotel_id=#{hotel_id} and r.del_flag=0 and t.del_flag=0
+  	</where>
+  </select>
+</mapper>

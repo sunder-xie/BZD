@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.rolemodule.mapper.UserRoleLinkMapper">
+
+	<insert id="batchsaveUserRoleLink" parameterType="java.util.List">
+		insert into user_role_link(user_id,meet_hall_id,role_id,meeting_id) values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.userId},#{item.meetHallId},#{item.roleId},#{item.meetingId})
+		</foreach>
+	</insert>
+
+	<select id="countUseridHallId" resultType="java.lang.Long">
+		select count(*) from
+		user_role_link where
+		user_id=#{userid} and meeting_id=#{meetid}
+	</select>
+
+	<select id="getHallIdByUserId" resultType="java.lang.Integer" parameterType="string">
+		select meeting_id
+		from user_role_link where role_id in (
+		select role_id from role where role_type='manager'
+		) and user_id= #{userid}
+	</select>
+
+
+</mapper>

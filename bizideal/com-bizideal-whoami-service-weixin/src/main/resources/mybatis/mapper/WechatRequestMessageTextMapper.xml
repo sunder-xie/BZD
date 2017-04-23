@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bizideal.whoami.weixin.mapper.WechatRequestMessageTextMapper">
+
+	<resultMap type="com.bizideal.whoami.weixin.entity.WechatRequestMessageText"
+		id="requestMessageText">
+            <id property="requestId" column="request_id" />
+			<result property="reqRuleName" column="req_rule_name" />
+			<result property="reqRespType" column="req_resp_type" />
+			<result property="keyWords" column="key_words" />
+	</resultMap>
+	
+	
+
+
+	<resultMap type="com.bizideal.whoami.weixin.entity.WechatRequestMessageText"
+		id="requestAndResponseMap" extends="requestMessageText">
+		<association property="textResponse"
+			javaType="com.bizideal.whoami.weixin.entity.WechatResponseMessageText">
+			<id property="responseId" column="response_id" />
+			<result property="respContent" column="resp_content" />
+			
+			<result property="reqKeyWords" column="req_key_words" />
+		
+			
+		</association>
+
+	</resultMap>
+
+	<select id="getReqAndRespByKey" resultMap="requestAndResponseMap" parameterType="string">
+		 SELECT req.*,resp.* from wechat_request_message_text req,wechat_response_message_text 
+		 resp where req.key_words=resp.req_key_words and req.key_words=#{reqKeyWords}
+	</select>
+	
+	<select id="getRequestByKey" resultMap="requestMessageText" parameterType="string">
+		 SELECT * from wechat_request_message_text where key_words=#{reqKeyWords}
+	</select>
+	
+	 <delete id="deleteReqByKey" parameterType="java.lang.String">
+		delete from wechat_request_message_text where key_words=#{keywords}
+	</delete>
+
+</mapper>

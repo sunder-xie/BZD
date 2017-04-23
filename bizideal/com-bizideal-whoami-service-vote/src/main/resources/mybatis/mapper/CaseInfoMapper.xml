@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bizideal.whoami.mapper.CaseInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.bizideal.whoami.vote.entity.CaseInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="case_vote_theme_id" property="caseVoteThemeId" jdbcType="INTEGER" />
+    <result column="province" property="province" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="thumb_img_url" property="thumbImgUrl" jdbcType="VARCHAR" />
+    <result column="case_type" property="caseType" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="del_flag" property="delFlag" jdbcType="TINYINT" />
+    <result column="number" property="number" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <insert id="insertCaseInfo" parameterType="com.bizideal.whoami.vote.entity.CaseInfo" useGeneratedKeys="true" keyProperty="id">
+  	insert into case_info 
+	  	<trim prefix="(" suffix=")" suffixOverrides=",">
+	  		<if test="caseVoteThemeId!=null">case_vote_theme_id,</if>
+	  		<if test="province!=null">province,</if>
+	  		<if test="unit!=null">unit,</if>
+	  		<if test="name!=null">name,</if>
+	  		<if test="url!=null">url,</if>
+	  		<if test="thumbImgUrl!=null">thumb_img_url,</if>
+	  		<if test="caseType!=null">case_type,</if>
+	  		<if test="userId!=null">user_id,</if>
+	  	</trim>
+	  	values 
+	  	<trim prefix="(" suffix=")" suffixOverrides=",">
+	  		<if test="caseVoteThemeId!=null">#{caseVoteThemeId},</if>
+	  		<if test="province!=null">#{province},</if>
+	  		<if test="unit!=null">#{unit},</if>
+	  		<if test="name!=null">#{name},</if>
+	  		<if test="url!=null">#{url},</if>
+	  		<if test="thumbImgUrl!=null">#{thumbImgUrl},</if>
+	  		<if test="caseType!=null">#{caseType},</if>
+	  		<if test="userId!=null">#{userId},</if>
+	  	</trim>
+  </insert>
+  
+  <select id="selectFuzzyByString" resultMap="BaseResultMap">
+  	select c.*,cc.number from case_info c 
+  	left outer join case_count cc on cc.case_id=c.id
+  	<where>
+  		case_vote_theme_id=#{caseVoteThemeId}
+  		and del_flag=0
+  		<if test="str!=null">
+  			and (province like CONCAT("%",#{str},"%") 
+			or unit like CONCAT("%",#{str},"%")
+			or name like CONCAT("%",#{str},"%"))
+  		</if>
+  	</where>
+  </select>
+  
+  <select id="selectCaseInfo" resultMap="BaseResultMap">
+  	select c.*,cc.number from case_info c 
+  	left outer join case_count cc on cc.case_id=c.id
+  	<where>
+  		case_vote_theme_id=#{caseVoteThemeId}
+  		and del_flag=0
+  	</where>
+  </select>
+</mapper>
